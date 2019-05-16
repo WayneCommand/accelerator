@@ -1,12 +1,12 @@
-spring:
-  profiles: s1
-  application:
-    name: user-service
 server:
   port: 8080
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: http://localhost:9001/eureka/
-  instance:
-    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+
+spring:
+  application:
+    name: user-service
+
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/mycloud?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=UTC
+    username: root
+    password: root

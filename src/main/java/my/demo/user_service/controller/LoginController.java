@@ -1,5 +1,6 @@
 package my.demo.user_service.controller;
 
+import my.demo.user_service.model.User;
 import my.demo.user_service.shiro.JwtToken;
 import my.demo.user_service.utils.JwtUtil;
 import org.apache.shiro.SecurityUtils;
@@ -24,6 +25,18 @@ public class LoginController {
 
         return token;
 
+    }
+
+    /**
+     * 注册接口
+     * @param user 用户名 密码
+     * @return
+     */
+    public String sign(User user) {
+
+
+
+        return null;
     }
 
 }

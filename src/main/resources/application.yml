@@ -6,7 +6,8 @@ spring:
     name: user-service
 
   datasource:
-    driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/mycloud?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=UTC
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://127.0.0.1:3306/mycloud
     username: root
     password: root
+    type: com.zaxxer.hikari.HikariDataSource

@@ -69,10 +69,18 @@
             <version>2.0.1</version>
         </dependency>
 
-        <!--mysql-->
+        <!--HikariCP数据库连接池-->
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>3.3.1</version>
+        </dependency>
+
+        <!--mariaDB and mysql-->
+        <dependency>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <version>2.4.1</version>
         </dependency>
 
 

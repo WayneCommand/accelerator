@@ -8,6 +8,8 @@
   - JWT（Java Web Token）
   - shiro （用户认证 目前没有权限相关的业务）
   - mybatis
+  - HikariCP(数据库连接池)
+  - MariaDB (Aria engine)
   
 ### 以后的feature
   - Oauth2

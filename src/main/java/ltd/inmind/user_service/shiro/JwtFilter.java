@@ -1,4 +1,4 @@
-package my.demo.user_service.shiro;
+package ltd.inmind.user_service.shiro;
 
 import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;
 import org.springframework.http.HttpStatus;

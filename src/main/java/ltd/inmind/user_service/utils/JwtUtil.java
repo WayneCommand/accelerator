@@ -1,4 +1,4 @@
-package my.demo.user_service.utils;
+package ltd.inmind.user_service.utils;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;

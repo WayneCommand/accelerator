@@ -1,7 +1,7 @@
-package my.demo.user_service.config;
+package ltd.inmind.user_service.config;
 
-import my.demo.user_service.shiro.JwtFilter;
-import my.demo.user_service.shiro.JwtRealm;
+import ltd.inmind.user_service.shiro.JwtFilter;
+import ltd.inmind.user_service.shiro.JwtRealm;
 import org.apache.shiro.mgt.DefaultSessionStorageEvaluator;
 import org.apache.shiro.mgt.DefaultSubjectDAO;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;

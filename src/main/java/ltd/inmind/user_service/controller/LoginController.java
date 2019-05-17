@@ -1,10 +1,12 @@
-package my.demo.user_service.controller;
+package ltd.inmind.user_service.controller;
 
-import my.demo.user_service.model.User;
-import my.demo.user_service.shiro.JwtToken;
-import my.demo.user_service.utils.JwtUtil;
+import ltd.inmind.user_service.model.User;
+import ltd.inmind.user_service.service.UserService;
+import ltd.inmind.user_service.shiro.JwtToken;
+import ltd.inmind.user_service.utils.JwtUtil;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,6 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/login")
 public class LoginController {
+
+    @Autowired
+    private UserService userService;
 
     @PostMapping("/byPassword")
     public String byPassword(String username, String password) {
@@ -32,11 +37,10 @@ public class LoginController {
      * @param user 用户名 密码
      * @return
      */
-    public String sign(User user) {
+    public String signUp(User user) {
 
 
-
-        return null;
+        return userService.signUp(user);
     }
 
 }

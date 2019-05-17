@@ -1,7 +1,7 @@
-package my.demo.user_service;
+package ltd.inmind.user_service;
 
-import my.demo.user_service.dao.UserDao;
-import my.demo.user_service.model.User;
+import ltd.inmind.user_service.dao.UserDao;
+import ltd.inmind.user_service.model.User;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

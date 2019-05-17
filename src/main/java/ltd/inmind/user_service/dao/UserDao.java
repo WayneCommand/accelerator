@@ -1,6 +1,6 @@
-package my.demo.user_service.dao;
+package ltd.inmind.user_service.dao;
 
-import my.demo.user_service.model.User;
+import ltd.inmind.user_service.model.User;
 import org.apache.ibatis.annotations.*;
 
 import java.util.Date;

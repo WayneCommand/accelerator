@@ -1,6 +1,6 @@
-package my.demo.user_service.shiro;
+package ltd.inmind.user_service.shiro;
 
-import my.demo.user_service.utils.JwtUtil;
+import ltd.inmind.user_service.utils.JwtUtil;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;

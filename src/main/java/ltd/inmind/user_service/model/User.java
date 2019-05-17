@@ -1,4 +1,4 @@
-package my.demo.user_service.model;
+package ltd.inmind.user_service.model;
 
 import java.util.Date;
 

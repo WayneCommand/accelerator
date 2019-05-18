@@ -11,6 +11,9 @@ import java.util.Date;
 public class JwtUtil {
     private static final long EXPIRE_TIME = 5 * 60 * 1000;
 
+    public static final String JWT_USERNAME = "username";
+
+
 
     /**
      * 校验token是否正确
@@ -24,7 +27,7 @@ public class JwtUtil {
             //根据密码生成JWT效验器
             Algorithm algorithm = Algorithm.HMAC256(secret);
             JWTVerifier verifier = JWT.require(algorithm)
-                    .withClaim("username", username)
+                    .withClaim(JWT_USERNAME, username)
                     .build();
             //效验TOKEN
             DecodedJWT jwt = verifier.verify(token);
@@ -37,12 +40,12 @@ public class JwtUtil {
     /**
      * 获得token中的信息无需secret解密也能获得
      *
-     * @return token中包含的用户名
+     * @return token中包含的claim
      */
-    public static String getUsername(String token) {
+    public static String getClaim(String token, String claim) {
         try {
             DecodedJWT jwt = JWT.decode(token);
-            return jwt.getClaim("username").asString();
+            return jwt.getClaim(claim).asString();
         } catch (JWTDecodeException e) {
             return null;
         }
@@ -60,7 +63,7 @@ public class JwtUtil {
         Algorithm algorithm = Algorithm.HMAC256(secret);
         // 附带username信息
         return JWT.create()
-                .withClaim("username", username)
+                .withClaim(JWT_USERNAME, username)
                 .withExpiresAt(date)
                 .sign(algorithm);
 

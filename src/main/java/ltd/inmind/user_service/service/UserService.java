@@ -7,4 +7,6 @@ public interface UserService {
 
     String signUp(User user);
 
+    User getUserByUsername(String username);
+
 }

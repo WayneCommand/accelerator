@@ -1,9 +1,14 @@
 package ltd.inmind.user_service.config;
 
+import ltd.inmind.user_service.constant.UserConst;
 import ltd.inmind.user_service.shiro.JwtFilter;
-import ltd.inmind.user_service.shiro.JwtRealm;
+import ltd.inmind.user_service.shiro.realm.JwtRealm;
+import ltd.inmind.user_service.shiro.realm.PasswordRealm;
+import org.apache.shiro.authc.credential.CredentialsMatcher;
+import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.mgt.DefaultSessionStorageEvaluator;
 import org.apache.shiro.mgt.DefaultSubjectDAO;
+import org.apache.shiro.mgt.SubjectDAO;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.springframework.context.annotation.Bean;
@@ -11,7 +16,7 @@ import org.springframework.context.annotation.Configuration;
 import org.apache.shiro.mgt.SecurityManager;
 
 import javax.servlet.Filter;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -23,44 +28,70 @@ public class ShiroConfig {
         ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
         shiroFilterFactoryBean.setSecurityManager(securityManager);
 
-        //拦截器
-        Map<String, String> filterChainDefinitionMap = new LinkedHashMap<String, String>();
-
-        // 配置不会被拦截的链接 顺序判断
-        filterChainDefinitionMap.put("/login/**", "anon");
-
-        //<!-- 过滤链定义，从上向下顺序执行，一般将/**放在最为下边
-        filterChainDefinitionMap.put("/**", "jwt");
-
-        // 添加自己的过滤器并且取名为jwt
-        Map<String, Filter> filterMap = new HashMap<String, Filter>(1);
-        filterMap.put("jwt", new JwtFilter());
-
-        shiroFilterFactoryBean.setFilters(filterMap);
+        shiroFilterFactoryBean.setFilters(filterMap());
+        shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap());
 
         //未授权界面;
         shiroFilterFactoryBean.setUnauthorizedUrl("/403");
 
-        shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
 
         return shiroFilterFactoryBean;
     }
 
-    @Bean("securityManager")
-    public SecurityManager securityManager(JwtRealm jwtRealm) {
-        DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
-        securityManager.setRealm(jwtRealm);
+    public Map<String, Filter> filterMap() {
+        Map<String, Filter> filterMap = new LinkedHashMap<>();
+        filterMap.put("jwtFilter", new JwtFilter());
+        return filterMap;
+    }
 
-        /*
-         * 关闭shiro自带的session，详情见文档
-         * http://shiro.apache.org/session-management.html#SessionManagement-StatelessApplications%28Sessionless%29
-         */
+
+    /**
+     * 拦截器链
+     * @return
+     */
+    public Map<String, String> filterChainDefinitionMap(){
+        Map<String, String> filterChainDefinitionMap = new LinkedHashMap<String, String>();
+        // 配置不会被拦截的链接 顺序判断
+        filterChainDefinitionMap.put("/login/**", "anon");
+
+        //过滤链定义，从上向下顺序执行，一般将/**放在最为下边
+        filterChainDefinitionMap.put("/**", "jwtFilter");
+
+        return filterChainDefinitionMap;
+    }
+
+    @Bean("securityManager")
+    public SecurityManager securityManager(JwtRealm jwtRealm, PasswordRealm passwordRealm, SubjectDAO subjectDAO) {
+        DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
+        securityManager.setRealms(Arrays.asList(jwtRealm, passwordRealm));
+        securityManager.setSubjectDAO(subjectDAO);
+
+        return securityManager;
+    }
+
+    /**
+     * 关闭shiro自带的session，详情见文档
+     * http://shiro.apache.org/session-management.html#SessionManagement-StatelessApplications%28Sessionless%29
+     * @return
+     */
+    @Bean
+    public SubjectDAO subjectDAO(){
         DefaultSubjectDAO subjectDAO = new DefaultSubjectDAO();
         DefaultSessionStorageEvaluator defaultSessionStorageEvaluator = new DefaultSessionStorageEvaluator();
         defaultSessionStorageEvaluator.setSessionStorageEnabled(false);
         subjectDAO.setSessionStorageEvaluator(defaultSessionStorageEvaluator);
-        securityManager.setSubjectDAO(subjectDAO);
+        return subjectDAO;
+    }
 
-        return securityManager;
+    /**
+     * 使用shiro的Hashed凭证匹配器 在Realm中利用setter进行注入
+     * @return HashedCredentialsMatcher
+     */
+    @Bean("credentialsMatcher")
+    public CredentialsMatcher credentialsMatcher(){
+        HashedCredentialsMatcher credentialsMatcher = new HashedCredentialsMatcher();
+        credentialsMatcher.setHashIterations(UserConst.USER_PASSWORD_HASH_ITERATIONS);
+        credentialsMatcher.setHashAlgorithmName(UserConst.USER_PASSWORD_ALGORITHM);
+        return credentialsMatcher;
     }
 }

@@ -19,6 +19,14 @@ public interface UserDao {
     })
     List<User> selectAll();
 
+    @Select("select * from t_user where username = #{username}")
+    @Results({
+            @Result(id = true, column = "u_id", property = "uId"),
+            @Result(column = "last_login", property = "lastLogin", javaType = Date.class),
+            @Result(column = "create_time", property = "createTime", javaType = Date.class),
+            @Result(column = "update_time", property = "updateTime", javaType = Date.class)
+    })
+    User selectUserByUsername(String username);
 
     @Insert("insert into t_user(username,password,salt,email,create_time)" +
             " values(#{user.username},#{user.password},#{user.salt},#{user.email},#{user.createTime})")

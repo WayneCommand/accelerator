@@ -25,7 +25,7 @@ public class PasswordRealm extends BaseRealm {
 
         User user = getUser((String) passwordToken.getPrincipal());
 
-        passwordToken.setSignature(user.getPassword());
+        passwordToken.setSecret(user.getPassword());
 
         return new SimpleAuthenticationInfo(user.getUsername(), user.getPassword(), ByteSource.Util.bytes(user.getSalt()), REALM_NAME);
     }

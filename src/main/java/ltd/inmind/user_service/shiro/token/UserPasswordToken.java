@@ -4,13 +4,13 @@ import org.apache.shiro.authc.UsernamePasswordToken;
 
 public class UserPasswordToken extends UsernamePasswordToken {
 
-    private String signature;
+    private String secret;
 
-    public String getSignature() {
-        return signature;
+    public String getSecret() {
+        return secret;
     }
 
-    public void setSignature(String signature) {
-        this.signature = signature;
+    public void setSecret(String secret) {
+        this.secret = secret;
     }
 }

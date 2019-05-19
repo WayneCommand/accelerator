@@ -35,7 +35,7 @@ public class LoginController {
 
         subject.login(token);
 
-        return JwtUtil.sign(username, token.getSignature());
+        return "Bearer " + JwtUtil.sign(username, token.getSecret());
     }
 
     /**

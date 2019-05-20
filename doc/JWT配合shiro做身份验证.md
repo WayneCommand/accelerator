@@ -62,8 +62,18 @@ signature：由base64编码的header + "." + payload 再用header中生成的加
 
 #### 0x04
 
-writing
+用户登录成功后 服务端会返回Token
+这个时候 不管是什么客户端 只需要把token放到header里就可以了
+
+> Authorization:Bearer aaa.bbb.ccc
 
 #### 0x05
 
-writing
+有了header的Authorization之后 服务端取出值
+拿出username 并从数据库里找 如果没有找到 该token是无效的
+如果找到了 进行下一步验证 拿出hash过的密码 交给JWT进行验证
+如果验证成功 该请求就是经过验证的 否则就禁止访问
+
+
+---
+整个流程就结束了 还是很简单的 right?

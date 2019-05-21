@@ -18,7 +18,7 @@ public class AonModularRealmAuthenticator extends ModularRealmAuthenticator {
         assertRealmsConfigured();
         List<Realm> realms = getRealms()
                 .stream()
-                .filter((realm) -> realm.supports(authenticationToken))
+                .filter(realm -> realm.supports(authenticationToken))
                 .collect(Collectors.toList());
 
         if (realms.size() == 1)

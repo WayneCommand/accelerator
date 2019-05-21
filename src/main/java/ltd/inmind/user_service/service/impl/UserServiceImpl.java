@@ -1,11 +1,14 @@
 package ltd.inmind.user_service.service.impl;
 
+import ltd.inmind.user_service.constant.LoginConst.SignUpStatusEnum;
 import ltd.inmind.user_service.constant.UserConst;
 import ltd.inmind.user_service.dao.UserDao;
 import ltd.inmind.user_service.model.User;
 import ltd.inmind.user_service.service.UserService;
 import ltd.inmind.user_service.utils.UUIDUtil;
 import org.apache.shiro.crypto.hash.SimpleHash;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,32 +17,23 @@ import java.util.Date;
 @Service
 public class UserServiceImpl implements UserService {
 
+    Logger LOG = LoggerFactory.getLogger(UserService.class);
+
     @Autowired
     private UserDao userDao;
 
 
     @Override
-    public String signUp(User user) {
+    public SignUpStatusEnum signUp(User user) {
 
         try {
-            String password = user.getPassword();
 
-            String salt = UUIDUtil.generateShortUuid();
-
-            SimpleHash simpleHash = new SimpleHash(UserConst.USER_PASSWORD_ALGORITHM, password, salt, UserConst.USER_PASSWORD_HASH_ITERATIONS);
-
-            user.setCreateTime(new Date());
-
-            user.setPassword(simpleHash.toHex());
-
-            user.setSalt(salt);
-
-            userDao.insert(user);
+            return doSignUp(user);
         } catch (Exception e) {
-            return "error";
-        }
 
-        return "success";
+            LOG.error("user service sign up error", e);
+            return SignUpStatusEnum.FAILED;
+        }
     }
 
     @Override
@@ -47,5 +41,30 @@ public class UserServiceImpl implements UserService {
 
         return userDao.selectUserByUsername(username);
     }
+
+    private SignUpStatusEnum doSignUp(User user) {
+
+        User byUsername = getUserByUsername(user.getUsername());
+        if (byUsername != null)
+            return SignUpStatusEnum.USER_NAME_ALREADY_EXIST;
+
+        String password = user.getPassword();
+
+        String salt = UUIDUtil.generateShortUuid();
+
+        SimpleHash simpleHash = new SimpleHash(UserConst.USER_PASSWORD_ALGORITHM, password, salt, UserConst.USER_PASSWORD_HASH_ITERATIONS);
+
+        user.setCreateTime(new Date());
+
+        user.setPassword(simpleHash.toHex());
+
+        user.setSalt(salt);
+
+        userDao.insert(user);
+
+        return SignUpStatusEnum.SUCCESS;
+    }
+
+
 
 }

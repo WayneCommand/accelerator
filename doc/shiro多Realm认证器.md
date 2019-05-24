@@ -29,4 +29,28 @@ shiro会自动调用多realm认证 并且通过supports来判断该Token是否�
 
 这要先从多Realm的认证策略讲起
 
-writing
+shiro的AbstractAuthenticationStrategy下的认证策略有三种
+
+ - AllSuccessfulStrategy
+ > 全部验证成功了 才算成功
+ 
+ - AtLeastOneSuccessfulStrategy
+ > 至少一个验证成功 会聚合返回数据
+ 
+ - FirstSuccessfulStrategy
+ > 第一个验证成功了就算成功 剩下的不管了
+ 
+知道了这三种验证策略 我们不妨想一下这种情况 在不同的认证策略是怎么处理的
+
+我有两个realm 在认证的过程中 两个realm抛出了不同的异常
+
+**AllSuccessfulStrategy**
+在第一个realm中 抛出异常 策略立即捕获 返回
+
+**AtLeastOneSuccessfulStrategy**
+在第一个realm中 抛出异常 策略捕获 进行下一个realm认证
+直到最后一个realm认证完毕 聚合数据 返回
+
+**FirstSuccessfulStrategy**
+在第一个realm中 抛出异常 策略捕获 进行下一个realm认证
+直到有一个realm认证完毕 然后返回

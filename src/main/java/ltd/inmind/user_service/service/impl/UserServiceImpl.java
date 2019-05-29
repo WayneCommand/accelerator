@@ -1,7 +1,7 @@
 package ltd.inmind.user_service.service.impl;
 
-import ltd.inmind.user_service.constant.LoginConst.SignUpStatusEnum;
-import ltd.inmind.user_service.constant.UserConst;
+import ltd.inmind.user_service.constants.LoginConst.SignUpStatusEnum;
+import ltd.inmind.user_service.constants.UserConst;
 import ltd.inmind.user_service.dao.UserDao;
 import ltd.inmind.user_service.model.User;
 import ltd.inmind.user_service.service.UserService;

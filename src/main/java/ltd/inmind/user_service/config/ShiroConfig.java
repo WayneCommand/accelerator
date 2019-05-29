@@ -1,6 +1,6 @@
 package ltd.inmind.user_service.config;
 
-import ltd.inmind.user_service.constant.UserConst;
+import ltd.inmind.user_service.constants.UserConst;
 import ltd.inmind.user_service.shiro.AonModularRealmAuthenticator;
 import ltd.inmind.user_service.shiro.JwtFilter;
 import ltd.inmind.user_service.shiro.realm.JwtRealm;

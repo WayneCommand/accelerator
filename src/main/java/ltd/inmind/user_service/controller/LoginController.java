@@ -1,6 +1,6 @@
 package ltd.inmind.user_service.controller;
 
-import ltd.inmind.user_service.constant.LoginConst.SignUpStatusEnum;
+import ltd.inmind.user_service.constants.LoginConst.SignUpStatusEnum;
 import ltd.inmind.user_service.model.User;
 import ltd.inmind.user_service.service.UserService;
 import ltd.inmind.user_service.shiro.token.UserPasswordToken;
@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.HashMap;
 import java.util.Map;
 
-import static ltd.inmind.user_service.constant.LoginConst.LoginStatusEnum.FAILED;
-import static ltd.inmind.user_service.constant.LoginConst.LoginStatusEnum.SUCCESS;
+import static ltd.inmind.user_service.constants.LoginConst.LoginStatusEnum.FAILED;
+import static ltd.inmind.user_service.constants.LoginConst.LoginStatusEnum.SUCCESS;
 
 
 @RestController

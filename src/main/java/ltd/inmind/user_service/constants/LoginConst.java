@@ -1,4 +1,4 @@
-package ltd.inmind.user_service.constant;
+package ltd.inmind.user_service.constants;
 
 public class LoginConst {
 

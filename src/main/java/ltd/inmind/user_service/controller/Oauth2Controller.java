@@ -1,5 +1,6 @@
 package ltd.inmind.user_service.controller;
 
+import ltd.inmind.user_service.model.AccessTokenResult;
 import ltd.inmind.user_service.service.Oauth2ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,7 +27,8 @@ public class Oauth2Controller {
      * @return
      */
     @GetMapping("/authorize")
-    public String authorize(String client_id, String redirect_uri, String scope, HttpServletResponse response) {
+    public String authorize(String client_id, String response_type, String redirect_uri, String scope, HttpServletResponse response) {
+
         //验证client
         if (!oauth2ClientService.verifyClientId(client_id))
             return "Incomplete request";
@@ -56,16 +58,21 @@ public class Oauth2Controller {
      * @return 标准返回access_token=e72e16c7e42f292c6912e7710c838347ae178b4a&token_type=bearer
      */
     @PostMapping("/access_token")
-    public String accessToken(String client_id, String client_secret, String code) {
+    public AccessTokenResult accessToken(String client_id, String client_secret, String code) {
         try {
             //验证id 和 secret 和 code
             String accessToken = oauth2ClientService.accessToken(client_id, client_secret, code);
-            String tokenType = "bearer";
+
+            AccessTokenResult accessTokenResult = new AccessTokenResult();
+            accessTokenResult.setAccess_token(accessToken);
+            accessTokenResult.setTokenType(AccessTokenResult.TOKEN_TYPE.BEARER);
 
             //成功之后返回token
-            return String.format("access_token=%s&token_type=%s", accessToken, tokenType);
+            return accessTokenResult;
         } catch (Exception e) {
-            return e.getMessage();
+            AccessTokenResult result = new AccessTokenResult();
+            result.setMessage(e.getMessage());
+            return result;
         }
     }
 

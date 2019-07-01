@@ -21,9 +21,9 @@ public class Oauth2Controller {
     /**
      * 授权
      *
-     * @param client_id
-     * @param redirect_uri
-     * @param scope
+     * @param client_id 客户端ID
+     * @param redirect_uri 重定向路径(不是必须的)
+     * @param scope 权限范围
      * @return
      */
     @GetMapping("/authorize")
@@ -52,10 +52,10 @@ public class Oauth2Controller {
 
     /**
      * 发放token
-     * @param client_id
-     * @param client_secret
-     * @param code
-     * @return 标准返回access_token=e72e16c7e42f292c6912e7710c838347ae178b4a&token_type=bearer
+     * @param client_id 客户端ID
+     * @param client_secret 颁发给客户端的密钥
+     * @param code authorize产生的密钥
+     * @return 重定向到redirect_uri 并包含一段AccessToken的json数据
      */
     @PostMapping("/access_token")
     public AccessTokenResult accessToken(String client_id, String client_secret, String code) {

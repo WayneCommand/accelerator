@@ -6,4 +6,4 @@ jdk:
   - oraclejdk8
 
 script:
-  - mvm install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+  - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V

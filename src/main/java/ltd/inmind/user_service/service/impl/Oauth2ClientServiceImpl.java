@@ -19,7 +19,7 @@ public class Oauth2ClientServiceImpl implements Oauth2ClientService {
 
     private Map<String, Long> CODE_MAP = new ConcurrentHashMap<>();
 
-    private long EXPRIED_TIME = 1000 * 60 * 10; //10 min
+    private long EXPIRED_TIME = 1000 * 60 * 10; //10 min
 
 
 
@@ -82,7 +82,7 @@ public class Oauth2ClientServiceImpl implements Oauth2ClientService {
         if (!CODE_MAP.containsKey(code))
             throw new RuntimeException("code invalid");
 
-        if ((CODE_MAP.get(code) + EXPRIED_TIME) <= System.currentTimeMillis())
+        if ((CODE_MAP.get(code) + EXPIRED_TIME) <= System.currentTimeMillis())
             throw new RuntimeException("code expried");
 
         String token = client_id + "_" + client_secret + "_" + UUIDUtil.generateShortUuid();

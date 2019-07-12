@@ -82,7 +82,7 @@ public class Oauth2ClientServiceImpl implements Oauth2ClientService {
         if (!CODE_MAP.containsKey(code))
             throw new RuntimeException("code invalid");
 
-        if ((CODE_MAP.get(code) + EXPRIED_TIME) > System.currentTimeMillis())
+        if ((CODE_MAP.get(code) + EXPRIED_TIME) <= System.currentTimeMillis())
             throw new RuntimeException("code expried");
 
         String token = client_id + "_" + client_secret + "_" + UUIDUtil.generateShortUuid();

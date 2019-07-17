@@ -1,6 +1,7 @@
 package ltd.inmind.user_service.service.impl;
 
-import ltd.inmind.user_service.dao.Oauth2ClientDao;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import ltd.inmind.user_service.mapper.Oauth2ClientMapper;
 import ltd.inmind.user_service.model.Oauth2Client;
 import ltd.inmind.user_service.service.Oauth2ClientService;
 import ltd.inmind.user_service.utils.UUIDUtil;
@@ -15,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Oauth2ClientServiceImpl implements Oauth2ClientService {
 
     @Autowired
-    private Oauth2ClientDao oauth2ClientDao;
+    private Oauth2ClientMapper oauth2ClientMapper;
 
     private Map<String, Long> CODE_MAP = new ConcurrentHashMap<>();
 
@@ -35,7 +36,7 @@ public class Oauth2ClientServiceImpl implements Oauth2ClientService {
             oauth2Client.setClientId(clientId);
             oauth2Client.setClientSecret(clientSecret);
 
-            oauth2ClientDao.insert(oauth2Client);
+            oauth2ClientMapper.insert(oauth2Client);
         } catch (Exception e) {
 
             //LOG
@@ -49,7 +50,7 @@ public class Oauth2ClientServiceImpl implements Oauth2ClientService {
     public boolean verifyClientId(String clientId) {
         try {
 
-            Oauth2Client oauth2Client = oauth2ClientDao.selectByClientId(clientId);
+            Oauth2Client oauth2Client = oauth2ClientMapper.selectById(clientId);
             return oauth2Client != null;
 
         } catch (Exception e) {
@@ -72,7 +73,10 @@ public class Oauth2ClientServiceImpl implements Oauth2ClientService {
     @Override
     public String accessToken(String client_id, String client_secret, String code) {
 
-        Oauth2Client oauth2Client = oauth2ClientDao.selectByClientId(client_id);
+        Oauth2Client oauth2Client = oauth2ClientMapper.selectOne(
+                Wrappers.<Oauth2Client>lambdaQuery()
+                        .eq(Oauth2Client::getClientId, client_id));
+
         if (oauth2Client == null)
             throw new RuntimeException("client id error");
 
@@ -83,8 +87,9 @@ public class Oauth2ClientServiceImpl implements Oauth2ClientService {
             throw new RuntimeException("code invalid");
 
         if ((CODE_MAP.get(code) + EXPIRED_TIME) <= System.currentTimeMillis())
-            throw new RuntimeException("code expried");
+            throw new RuntimeException("code expired");
 
+        //TODO 调整token的内容
         String token = client_id + "_" + client_secret + "_" + UUIDUtil.generateShortUuid();
 
         return DigestUtils.sha256Hex(token);

@@ -9,6 +9,10 @@ public class AccessTokenResult {
 
     private String message;
 
+    private String expires_in;
+
+    private String refresh_token;
+
     public String getMessage() {
         return message;
     }
@@ -42,6 +46,22 @@ public class AccessTokenResult {
     }
     public void setTokenType(TOKEN_TYPE tokenType){
         setToken_type(tokenType.getValue());
+    }
+
+    public String getExpires_in() {
+        return expires_in;
+    }
+
+    public void setExpires_in(String expires_in) {
+        this.expires_in = expires_in;
+    }
+
+    public String getRefresh_token() {
+        return refresh_token;
+    }
+
+    public void setRefresh_token(String refresh_token) {
+        this.refresh_token = refresh_token;
     }
 
     public enum TOKEN_TYPE{

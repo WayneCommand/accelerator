@@ -1,8 +1,9 @@
 package ltd.inmind.user_service.service.impl;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import ltd.inmind.user_service.constants.LoginConst.SignUpStatusEnum;
 import ltd.inmind.user_service.constants.UserConst;
-import ltd.inmind.user_service.dao.UserDao;
+import ltd.inmind.user_service.mapper.UserMapper;
 import ltd.inmind.user_service.model.User;
 import ltd.inmind.user_service.service.UserService;
 import ltd.inmind.user_service.utils.UUIDUtil;
@@ -20,7 +21,7 @@ public class UserServiceImpl implements UserService {
     Logger LOG = LoggerFactory.getLogger(UserService.class);
 
     @Autowired
-    private UserDao userDao;
+    private UserMapper userMapper;
 
 
     @Override
@@ -39,7 +40,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUserByUsername(String username) {
 
-        return userDao.selectUserByUsername(username);
+        return userMapper.selectOne(Wrappers
+                .<User>lambdaQuery()
+                .eq(User::getUsername, username));
     }
 
     private SignUpStatusEnum doSignUp(User user) {
@@ -60,7 +63,7 @@ public class UserServiceImpl implements UserService {
 
         user.setSalt(salt);
 
-        userDao.insert(user);
+        userMapper.insert(user);
 
         return SignUpStatusEnum.SUCCESS;
     }

@@ -1,6 +1,8 @@
 package ltd.inmind.user_service;
 
-import ltd.inmind.user_service.dao.UserDao;
+import ltd.inmind.user_service.mapper.Oauth2ClientMapper;
+import ltd.inmind.user_service.mapper.UserMapper;
+import ltd.inmind.user_service.model.Oauth2Client;
 import ltd.inmind.user_service.model.User;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,11 +18,16 @@ import java.util.List;
 public class MapperTests {
 
     @Autowired
-    private UserDao userDao;
+    private UserMapper userMapper;
+
+    @Autowired
+    private Oauth2ClientMapper oauth2ClientMapper;
 
     @Test
     public void selectAll(){
-        List<User> users = userDao.selectAll();
+        List<User> users = userMapper.selectList(null);
+
+        List<Oauth2Client> oauth2Clients = oauth2ClientMapper.selectList(null);
 
         System.out.println(users);
     }
@@ -35,7 +42,7 @@ public class MapperTests {
         user.setSalt("sss");
         user.setCreateTime(new Date());
 
-        int insert = userDao.insert(user);
+        int insert = userMapper.insert(user);
         System.out.println(user);
         System.out.println(insert);
 
@@ -43,14 +50,14 @@ public class MapperTests {
 
     @Test
     public void testUpdate(){
-        List<User> users = userDao.selectAll();
+        List<User> users = userMapper.selectList(null);
 
         User user = users.get(0);
 
         user.setPassword("zddasdas");
         user.setSalt("zzzzzzz");
 
-        int update = userDao.update(user);
+        int update = userMapper.updateById(user);
         System.out.println(update);
 
 

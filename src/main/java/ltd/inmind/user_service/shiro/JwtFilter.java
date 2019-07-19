@@ -40,7 +40,7 @@ public class JwtFilter extends BasicHttpAuthenticationFilter {
         if (!token.startsWith("Bearer "))
             return false;
 
-        JwtToken jwtToken = new JwtToken(token.substring(8));
+        JwtToken jwtToken = new JwtToken(token.substring(7));
 
         // 提交给realm进行登入，如果错误他会抛出异常并被捕获
         getSubject(request, response).login(jwtToken);

@@ -1,6 +1,7 @@
 package ltd.inmind.user_service.service.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import ltd.inmind.user_service.constants.Oauth2Const;
 import ltd.inmind.user_service.mapper.Oauth2ClientMapper;
 import ltd.inmind.user_service.model.Oauth2Client;
 import ltd.inmind.user_service.service.Oauth2ClientService;
@@ -9,19 +10,14 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import static ltd.inmind.user_service.constants.Oauth2Const.EXPIRED_TIME;
+import static ltd.inmind.user_service.constants.Oauth2Const.OAUTH2_MEM_CACHE;
 
 @Service
 public class Oauth2ClientServiceImpl implements Oauth2ClientService {
 
     @Autowired
     private Oauth2ClientMapper oauth2ClientMapper;
-
-    private Map<String, Long> CODE_MAP = new ConcurrentHashMap<>();
-
-    private long EXPIRED_TIME = 1000 * 60 * 10; //10 min
-
 
 
     @Override
@@ -60,10 +56,10 @@ public class Oauth2ClientServiceImpl implements Oauth2ClientService {
     }
 
     @Override
-    public String grantCode() {
+    public String grantCode(String username) {
         try {
             String code = UUIDUtil.generateShortUuid();
-            CODE_MAP.put(code, System.currentTimeMillis());
+            Oauth2Const.OAUTH2_MEM_CACHE.put(code, username, EXPIRED_TIME);
             return code;
         } catch (Exception e) {
             return null;
@@ -83,14 +79,13 @@ public class Oauth2ClientServiceImpl implements Oauth2ClientService {
         if (!oauth2Client.getClientSecret().equals(client_secret))
             throw new RuntimeException("secret invalid");
 
-        if (!CODE_MAP.containsKey(code))
-            throw new RuntimeException("code invalid");
-
-        if ((CODE_MAP.get(code) + EXPIRED_TIME) <= System.currentTimeMillis())
+        if (OAUTH2_MEM_CACHE.isExpired(code, true))
             throw new RuntimeException("code expired");
 
-        //TODO 调整token的内容
-        String token = client_id + "_" + client_secret + "_" + UUIDUtil.generateShortUuid();
+        String username = OAUTH2_MEM_CACHE.get(code);
+
+        //TODO 保存用户的授权记录
+        String token = client_id + "_" + username + "_" + UUIDUtil.generateShortUuid();
 
         return DigestUtils.sha256Hex(token);
     }

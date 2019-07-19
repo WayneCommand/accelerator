@@ -23,7 +23,7 @@ public interface Oauth2ClientService {
      * 发放授权码
      * @return
      */
-    String grantCode();
+    String grantCode(String username);
 
     String accessToken(String client_id, String client_secret, String code);
 

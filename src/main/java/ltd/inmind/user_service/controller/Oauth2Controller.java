@@ -2,6 +2,7 @@ package ltd.inmind.user_service.controller;
 
 import ltd.inmind.user_service.model.AccessTokenResult;
 import ltd.inmind.user_service.service.Oauth2ClientService;
+import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,10 +34,11 @@ public class Oauth2Controller {
         if (!oauth2ClientService.verifyClientId(client_id))
             return "Incomplete request";
 
-        //用户需要确认授权
+        //用户需要确认授权 (这里就直接同意了)
         if (true) {
             //如果用户确认了授权 将带着授权码(code) 重定向到redirect url
-            String code = oauth2ClientService.grantCode();
+            Object principal = SecurityUtils.getSubject().getPrincipal();
+            String code = oauth2ClientService.grantCode((String) principal);
             try {
                 response.sendRedirect(String.format("%s?code=%s", redirect_uri, code));
             } catch (IOException e) {
@@ -55,7 +57,7 @@ public class Oauth2Controller {
      * @param client_id 客户端ID
      * @param client_secret 颁发给客户端的密钥
      * @param code authorize产生的密钥
-     * @return 重定向到redirect_uri 并包含一段AccessToken的json数据
+     * @return AccessToken
      */
     @PostMapping("/access_token")
     public AccessTokenResult accessToken(String client_id, String client_secret, String code) {

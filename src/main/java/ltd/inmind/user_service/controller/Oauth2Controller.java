@@ -63,6 +63,7 @@ public class Oauth2Controller {
     public AccessTokenResult accessToken(String client_id, String client_secret, String code) {
         try {
             //验证id 和 secret 和 code
+            //TODO fix bug 用A client_id 申请的code 使用B client_id可以验证
             String accessToken = oauth2ClientService.accessToken(client_id, client_secret, code);
 
             AccessTokenResult accessTokenResult = new AccessTokenResult();

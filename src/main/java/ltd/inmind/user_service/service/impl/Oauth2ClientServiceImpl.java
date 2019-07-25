@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import ltd.inmind.user_service.constants.Oauth2Const;
 import ltd.inmind.user_service.mapper.Oauth2ClientMapper;
 import ltd.inmind.user_service.model.Oauth2Client;
+import ltd.inmind.user_service.service.Oauth2AccessTokenService;
 import ltd.inmind.user_service.service.Oauth2ClientService;
 import ltd.inmind.user_service.utils.UUIDUtil;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -19,8 +20,10 @@ public class Oauth2ClientServiceImpl implements Oauth2ClientService {
     @Autowired
     private Oauth2ClientMapper oauth2ClientMapper;
 
+    @Autowired
+    private Oauth2AccessTokenService accessTokenService;
 
-    @Override
+   @Override
     public boolean newClient(Oauth2Client oauth2Client) {
         try {
 
@@ -46,7 +49,8 @@ public class Oauth2ClientServiceImpl implements Oauth2ClientService {
     public boolean verifyClientId(String clientId) {
         try {
 
-            Oauth2Client oauth2Client = oauth2ClientMapper.selectById(clientId);
+            Oauth2Client oauth2Client = oauth2ClientMapper.selectOne(Wrappers.<Oauth2Client>lambdaQuery()
+            .eq(Oauth2Client::getClientId,clientId));
             return oauth2Client != null;
 
         } catch (Exception e) {
@@ -79,15 +83,18 @@ public class Oauth2ClientServiceImpl implements Oauth2ClientService {
         if (!oauth2Client.getClientSecret().equals(client_secret))
             throw new RuntimeException("secret invalid");
 
-        if (OAUTH2_MEM_CACHE.isExpired(code, true))
-            throw new RuntimeException("code expired");
-
         String username = OAUTH2_MEM_CACHE.get(code);
 
-        //TODO 保存用户的授权记录
+        if (username == null)
+            throw new RuntimeException("code expired");
+
         String token = client_id + "_" + username + "_" + UUIDUtil.generateShortUuid();
 
-        return DigestUtils.sha256Hex(token);
+        String accessToken = DigestUtils.sha256Hex(token);
+
+        accessTokenService.addAccessTokenRecord(oauth2Client.getId(), username, accessToken);
+
+        return accessToken;
     }
 
 }

@@ -4,6 +4,10 @@ import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
+/**
+ * @author shenlan#https://github.com/shenlanAZ
+ * @version 0.2
+ */
 public class KVPlusMap<K, V> extends AbstractMap<K, V> {
 
     private Map<K, V> kvHashMap = new HashMap<>();
@@ -42,20 +46,18 @@ public class KVPlusMap<K, V> extends AbstractMap<K, V> {
 
     @Override
     public synchronized boolean remove(Object key, Object value) {
-        if (isExpired(key, true)) {
+        if (isExpired(key, true))
             return false;
-        }
-        kvHashMap.remove(key, value);
+
         expiryMap.remove(key);
-        return true;
+        return kvHashMap.remove(key, value);
     }
 
 
     @Override
     public synchronized V remove(Object key) {
-        if (isExpired(key, true)) {
+        if (isExpired(key, true))
             return null;
-        }
 
         expiryMap.remove(key);
         return kvHashMap.remove(key);
@@ -73,7 +75,11 @@ public class KVPlusMap<K, V> extends AbstractMap<K, V> {
      *
      * @return true = 过期 ， false = 有效。
      */
-    public synchronized boolean isExpired(Object key) {
+    private synchronized boolean isExpired(Object key) {
+        return isExpired(key, false);
+    }
+
+    private synchronized boolean isExpired(Object key, boolean remove) {
         if (!expiryMap.containsKey(key))
             return true;
 
@@ -82,11 +88,7 @@ public class KVPlusMap<K, V> extends AbstractMap<K, V> {
         if (expiryTime == DEFAULT_EXPIRED_TIME)
             return false;
 
-        return System.currentTimeMillis() > expiryTime;
-    }
-
-    public synchronized boolean isExpired(Object key, boolean remove) {
-        if (isExpired(key)){
+        if (System.currentTimeMillis() > expiryTime){
             if (remove){
                 kvHashMap.remove(key);
                 expiryMap.remove(key);
@@ -96,7 +98,15 @@ public class KVPlusMap<K, V> extends AbstractMap<K, V> {
         return false;
     }
 
+    @Override
+    public boolean containsKey(Object key) {
+        return !isExpired(key, true);
+    }
 
+    @Override
+    public boolean containsValue(Object value) {
+        throw new UnsupportedOperationException();
+    }
 
     @Override
     public void forEach(BiConsumer<? super K, ? super V> action) {

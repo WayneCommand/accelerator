@@ -38,7 +38,7 @@ public class Oauth2Controller {
         if (true) {
             //如果用户确认了授权 将带着授权码(code) 重定向到redirect url
             Object principal = SecurityUtils.getSubject().getPrincipal();
-            String code = oauth2ClientService.grantCode((String) principal);
+            String code = oauth2ClientService.grantCode(client_id,(String) principal);
             try {
                 response.sendRedirect(String.format("%s?code=%s", redirect_uri, code));
             } catch (IOException e) {
@@ -63,7 +63,6 @@ public class Oauth2Controller {
     public AccessTokenResult accessToken(String client_id, String client_secret, String code) {
         try {
             //验证id 和 secret 和 code
-            //TODO fix bug 用A client_id 申请的code 使用B client_id可以验证
             String accessToken = oauth2ClientService.accessToken(client_id, client_secret, code);
 
             AccessTokenResult accessTokenResult = new AccessTokenResult();

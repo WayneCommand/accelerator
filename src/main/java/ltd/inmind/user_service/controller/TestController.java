@@ -9,14 +9,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/test")
 public class TestController {
 
-    @PostMapping("/test")
+    @RequestMapping("/test")
     public String test(){
 
         Object principal = SecurityUtils.getSubject().getPrincipal();
 
         System.out.println(principal);
 
-        return "hello";
+        return String.format("hello, %s.", principal);
     }
-
 }

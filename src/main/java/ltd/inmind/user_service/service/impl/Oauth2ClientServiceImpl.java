@@ -59,11 +59,15 @@ public class Oauth2ClientServiceImpl implements Oauth2ClientService {
         }
     }
 
+    /**
+     * 授权码的kv结构：
+     * clientId_code = username
+     */
     @Override
-    public String grantCode(String username) {
+    public String grantCode(String client_id, String username) {
         try {
             String code = UUIDUtil.generateShortUuid();
-            Oauth2Const.OAUTH2_MEM_CACHE.put(code, username, EXPIRED_TIME);
+            Oauth2Const.OAUTH2_MEM_CACHE.put(client_id + "_" + code, username, EXPIRED_TIME);
             return code;
         } catch (Exception e) {
             return null;
@@ -82,8 +86,8 @@ public class Oauth2ClientServiceImpl implements Oauth2ClientService {
 
         if (!oauth2Client.getClientSecret().equals(client_secret))
             throw new RuntimeException("secret invalid");
-
-        String username = OAUTH2_MEM_CACHE.get(code);
+        String codeKey = client_id + "_" + code;
+        String username = OAUTH2_MEM_CACHE.get(codeKey);
 
         if (username == null)
             throw new RuntimeException("code expired");
@@ -91,6 +95,8 @@ public class Oauth2ClientServiceImpl implements Oauth2ClientService {
         String token = client_id + "_" + username + "_" + UUIDUtil.generateShortUuid();
 
         String accessToken = DigestUtils.sha256Hex(token);
+
+        OAUTH2_MEM_CACHE.remove(codeKey);
 
         accessTokenService.addAccessTokenRecord(oauth2Client.getId(), username, accessToken);
 

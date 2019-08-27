@@ -1,4 +1,4 @@
-# 用户认证服务
+# `一方通行`用户认证服务
 
 ### 该项目存在的理由如下
   - 以后将会用于我其他项目的用户认证。
@@ -14,5 +14,7 @@
   - Oauth2 (oauth2授权服务 还在完善中)
   
 ### 以后的feature
-  - 基于React的 WebUI (有很高几率是Vue)
   - 集群架构
+  
+### WebUI
+参见：https://github.com/shenlanAZ/accelerator_ui

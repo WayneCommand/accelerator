@@ -120,8 +120,8 @@ public class LoginController {
      * @param token 将要过期的token
      * @return
      */
-    @PostMapping("/jwtTokenRenewal")
-    public Map<String, String> jwtTokenRenewal(String token) {
+    @PostMapping("/refreshJwtToken")
+    public Map<String, String> refreshJwtToken(String token) {
 
         //TODO 续期逻辑
         return Collections.emptyMap();

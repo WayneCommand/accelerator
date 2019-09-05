@@ -2,7 +2,6 @@ package ltd.inmind.accelerator.controller;
 
 import ltd.inmind.accelerator.model.AccessTokenResult;
 import ltd.inmind.accelerator.service.Oauth2ClientService;
-import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 @RestController
 @RequestMapping("/oauth/2")
@@ -29,6 +27,7 @@ public class Oauth2Controller {
      */
     @GetMapping("/authorize")
     public String authorize(String client_id, String response_type, String redirect_uri, String scope, HttpServletResponse response) {
+        //TODO spring security
 
         //验证client
         if (!oauth2ClientService.verifyClientId(client_id))
@@ -37,13 +36,10 @@ public class Oauth2Controller {
         //用户需要确认授权 (这里就直接同意了)
         if (true) {
             //如果用户确认了授权 将带着授权码(code) 重定向到redirect url
-            Object principal = SecurityUtils.getSubject().getPrincipal();
-            String code = oauth2ClientService.grantCode(client_id,(String) principal);
-            try {
-                response.sendRedirect(String.format("%s?code=%s", redirect_uri, code));
-            } catch (IOException e) {
-                //LOG
-            }
+
+            //String code = oauth2ClientService.grantCode(client_id,(String) "");
+            //response.sendRedirect(String.format("%s?code=%s", redirect_uri, code));
+
             return "redirect error";
         } else {
             return "user refused";

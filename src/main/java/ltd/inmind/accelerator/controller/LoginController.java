@@ -3,13 +3,7 @@ package ltd.inmind.accelerator.controller;
 import ltd.inmind.accelerator.constants.LoginConst.SignUpStatusEnum;
 import ltd.inmind.accelerator.model.User;
 import ltd.inmind.accelerator.service.UserService;
-import ltd.inmind.accelerator.shiro.token.UserPasswordToken;
-import ltd.inmind.accelerator.utils.JwtUtil;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.ShiroException;
-import org.apache.shiro.authc.*;
-import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,8 +14,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static ltd.inmind.accelerator.constants.LoginConst.LoginStatusEnum.FAILED;
-import static ltd.inmind.accelerator.constants.LoginConst.LoginStatusEnum.SUCCESS;
-
 
 @RestController
 @RequestMapping("/login")
@@ -39,7 +31,8 @@ public class LoginController {
      */
     @PostMapping("/byPassword")
     public Map<String, String> byPassword(String username, String password) {
-        Subject subject = SecurityUtils.getSubject();
+        //TODO spring security
+
         Map<String, String> result = new HashMap<>();
 
         if (StringUtils.isAnyBlank(username, password)) {
@@ -48,37 +41,6 @@ public class LoginController {
             return result;
         }
 
-        UserPasswordToken token = new UserPasswordToken();
-        token.setUsername(username);
-        token.setPassword(password.toCharArray());
-
-        try {
-            subject.login(token);
-        } catch (UnknownAccountException e) {
-            result.put("status", FAILED.getValue());
-            result.put("message", "未知的账户");
-        } catch (LockedAccountException e) {
-            result.put("status", FAILED.getValue());
-            result.put("message", "账户已锁定");
-        } catch (DisabledAccountException e) {
-            result.put("status", FAILED.getValue());
-            result.put("message", "账户已禁用");
-        } catch (IncorrectCredentialsException e) {
-            result.put("status", FAILED.getValue());
-            result.put("message", "密码错误");
-        } catch (ShiroException e){
-            result.put("status", FAILED.getValue());
-            result.put("message", "系统错误");
-        }
-
-        if (FAILED.getValue().equals(result.get("status"))) {
-            return result;
-        }
-
-        String jwt = "Bearer " + JwtUtil.sign(username, token.getSecret());
-
-        result.put("status", SUCCESS.getValue());
-        result.put("token", jwt);
 
         return result;
     }

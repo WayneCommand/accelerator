@@ -2,12 +2,10 @@ package ltd.inmind.accelerator.service.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import ltd.inmind.accelerator.constants.LoginConst.SignUpStatusEnum;
-import ltd.inmind.accelerator.constants.UserConst;
 import ltd.inmind.accelerator.mapper.UserMapper;
 import ltd.inmind.accelerator.model.User;
 import ltd.inmind.accelerator.service.UserService;
 import ltd.inmind.accelerator.utils.UUIDUtil;
-import org.apache.shiro.crypto.hash.SimpleHash;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +45,8 @@ public class UserServiceImpl implements UserService {
 
     private SignUpStatusEnum doSignUp(User user) {
 
+        //TODO spring security
+
         User byUsername = getUserByUsername(user.getUsername());
         if (byUsername != null)
             return SignUpStatusEnum.USER_NAME_ALREADY_EXIST;
@@ -55,11 +55,10 @@ public class UserServiceImpl implements UserService {
 
         String salt = UUIDUtil.generateShortUuid();
 
-        SimpleHash simpleHash = new SimpleHash(UserConst.USER_PASSWORD_ALGORITHM, password, salt, UserConst.USER_PASSWORD_HASH_ITERATIONS);
 
         user.setCreateTime(new Date());
 
-        user.setPassword(simpleHash.toHex());
+        user.setPassword("");
 
         user.setSalt(salt);
 

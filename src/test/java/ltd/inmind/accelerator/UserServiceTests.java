@@ -2,7 +2,6 @@ package ltd.inmind.accelerator;
 
 import ltd.inmind.accelerator.model.User;
 import ltd.inmind.accelerator.service.UserService;
-import ltd.inmind.accelerator.utils.UUIDUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +22,7 @@ public class UserServiceTests {
     public void testSignUp(){
 
         User user = new User();
-        user.setUsername("test_" + UUIDUtil.generateShortUuid());
+        user.setUsername("shenlan");
         user.setPassword("123456");
         //user.setEmail("123@321.com");
 

@@ -3,7 +3,6 @@ package ltd.inmind.accelerator.controller;
 import ltd.inmind.accelerator.constants.LoginConst.SignUpStatusEnum;
 import ltd.inmind.accelerator.model.User;
 import ltd.inmind.accelerator.service.UserService;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,7 +12,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import static ltd.inmind.accelerator.constants.LoginConst.LoginStatusEnum.FAILED;
 
 @RestController
 @RequestMapping("/login")
@@ -21,29 +19,6 @@ public class LoginController {
 
     @Autowired
     private UserService userService;
-
-    /**
-     * 登录接口
-     *
-     * @param username
-     * @param password
-     * @return
-     */
-    @PostMapping("/byPassword")
-    public Map<String, String> byPassword(String username, String password) {
-        //TODO spring security
-
-        Map<String, String> result = new HashMap<>();
-
-        if (StringUtils.isAnyBlank(username, password)) {
-            result.put("status", FAILED.getValue());
-            result.put("message", "参数格式错误.");
-            return result;
-        }
-
-
-        return result;
-    }
 
     /**
      * 注册接口

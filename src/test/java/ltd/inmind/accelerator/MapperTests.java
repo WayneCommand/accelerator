@@ -39,7 +39,6 @@ public class MapperTests {
         User user = new User();
         user.setUsername("test1");
         user.setPassword("111111");
-        user.setSalt("sss");
         user.setCreateTime(new Date());
 
         int insert = userMapper.insert(user);
@@ -55,7 +54,6 @@ public class MapperTests {
         User user = users.get(0);
 
         user.setPassword("zddasdas");
-        user.setSalt("zzzzzzz");
 
         int update = userMapper.updateById(user);
         System.out.println(update);

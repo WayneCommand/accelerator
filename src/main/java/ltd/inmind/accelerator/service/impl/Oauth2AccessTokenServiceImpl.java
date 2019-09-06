@@ -26,7 +26,7 @@ public class Oauth2AccessTokenServiceImpl implements Oauth2AccessTokenService {
 
         User userByUsername = userService.getUserByUsername(username);
 
-        oauth2AccessToken.setuId(userByUsername.getuId());
+        oauth2AccessToken.setuId(userByUsername.getUId());
 
         oauth2AccessToken.setAccessToken(accessToken);
 

@@ -2,21 +2,7 @@ package ltd.inmind.accelerator.constants;
 
 public class LoginConst {
 
-    public enum LoginStatusEnum{
-        SUCCESS("S"),
-        FAILED("F");
-
-
-        private String value;
-
-        LoginStatusEnum(String value) {
-            this.value = value;
-        }
-
-        public String getValue() {
-            return value;
-        }
-    }
+    public static final String AUTHORIZATION_HEADER_NAME = "Authorization";
 
     public enum SignUpStatusEnum{
         SUCCESS("S"),

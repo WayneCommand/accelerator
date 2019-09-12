@@ -1,19 +1,25 @@
 package ltd.inmind.accelerator.config;
 
+import ltd.inmind.accelerator.security.jwt.*;
+import ltd.inmind.accelerator.security.jwt.handler.JwtAuthenticationFailureHandler;
+import ltd.inmind.accelerator.security.jwt.handler.JwtAuthenticationSuccessHandler;
+import ltd.inmind.accelerator.security.jwt.provider.JwtAuthenticationProvider;
+import ltd.inmind.accelerator.security.jwt.repository.JwtSecurityContextRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.context.SecurityContextRepository;
 
 @EnableWebSecurity
 public class SecurityConfig {
@@ -36,6 +42,7 @@ public class SecurityConfig {
         @Override
         protected void configure(AuthenticationManagerBuilder auth) throws Exception {
             auth.userDetailsService(userDetailsService);
+            auth.setSharedObject(SecurityContextRepository.class, JwtSecurityContextRepository.getInstance());
         }
 
         @Override
@@ -47,27 +54,28 @@ public class SecurityConfig {
                     .formLogin()
 
                     //认证失败后的行为
-                    .failureHandler((request, response, e) -> {
-                        response.setStatus(HttpStatus.OK.value());
-                        response.setContentType("application/json;charset=UTF-8");
-                        response.getWriter().println("{\"code\":\"2\",\"msg\":\"登陆失败\"}");
-                        e.printStackTrace();
-                        //TODO 处理异常
-                    })
+                    .failureHandler(new JwtAuthenticationFailureHandler())
 
                     //认证成功后的行为
-                    .successHandler((request, response, e) -> {
-                        response.setStatus(HttpStatus.OK.value());
-                        response.setContentType("application/json;charset=UTF-8");
-                        response.getWriter().println("{\"code\":\"1\",\"msg\":\"登陆成功\"}");
-                    })
-                    .and()
+                    .successHandler(new JwtAuthenticationSuccessHandler())
 
+                    .and()
                     //所有的请求都需要认证
                     .authorizeRequests()
                     .anyRequest()
-                    .authenticated();
+                    .authenticated()
 
+                    //无状态session
+                    .and()
+                    .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+
+                    //JWT相关配置
+                    .and()
+                    .apply(new JwtManagementConfigurer<>())
+
+                    //JWT认证Provider
+                    .and()
+                    .authenticationProvider(new JwtAuthenticationProvider());
 
         }
     }

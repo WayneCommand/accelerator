@@ -1,11 +1,12 @@
 package ltd.inmind.accelerator.security.jwt.token;
 
-import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
 
+@Getter
 public class JwtAuthenticationToken extends AbstractAuthenticationToken {
 
     private String token;

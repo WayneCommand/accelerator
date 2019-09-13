@@ -18,13 +18,11 @@ import org.springframework.security.web.context.SecurityContextRepository;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+
+import static ltd.inmind.accelerator.constants.LoginConst.TOKEN_SESSION;
 
 @Slf4j
 public class JwtSecurityContextRepository implements SecurityContextRepository {
-
-    private static final Map<String, String> TOKEN_SESSION = new HashMap<>();
 
     private static JwtSecurityContextRepository securityContextRepository = new JwtSecurityContextRepository();
 
@@ -38,12 +36,11 @@ public class JwtSecurityContextRepository implements SecurityContextRepository {
 
     @Override
     public SecurityContext loadContext(HttpRequestResponseHolder requestResponseHolder) {
-        //TODO 重新组装逻辑
         String authorization = requestResponseHolder.getRequest().getHeader(LoginConst.AUTHORIZATION_HEADER_NAME);
-        if (StringUtils.isNotBlank(authorization) && TOKEN_SESSION.containsKey(authorization)) {
-            SecurityContext securityContext = new SecurityContextImpl();
-            securityContext.setAuthentication(new JwtAuthenticationToken(authorization, Collections.emptyList()));
 
+        if (StringUtils.isNotBlank(authorization) && TOKEN_SESSION.containsKey(authorization.substring(7))) {
+            SecurityContext securityContext = new SecurityContextImpl();
+            securityContext.setAuthentication(new JwtAuthenticationToken(authorization.substring(7), Collections.emptyList()));
             return securityContext;
         }
 
@@ -77,7 +74,7 @@ public class JwtSecurityContextRepository implements SecurityContextRepository {
 
         TOKEN_SESSION.put(token, code);
 
-        response.setHeader(LoginConst.AUTHORIZATION_HEADER_NAME, token);
+        response.setHeader(LoginConst.AUTHORIZATION_HEADER_NAME, LoginConst.AUTHORIZATION_PREFIX + token);
     }
 
     @Override
@@ -85,6 +82,7 @@ public class JwtSecurityContextRepository implements SecurityContextRepository {
 
         String authorization = request.getHeader(LoginConst.AUTHORIZATION_HEADER_NAME);
 
-        return StringUtils.isNotBlank(authorization) && TOKEN_SESSION.containsKey(authorization);
+        return StringUtils.isNotBlank(authorization) && TOKEN_SESSION.containsKey(authorization.substring(7));
     }
+
 }

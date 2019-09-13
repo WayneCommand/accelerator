@@ -6,7 +6,7 @@
   
 ### 服务基于springboot 目前集成了
   - JWT（Java Web Token）
-  - shiro （用户认证 目前没有权限相关的业务）
+  - spring security （用户认证 目前没有权限相关的业务）
   - mybatis
   - mybatis-plus (简化开发的神器)
   - HikariCP(数据库连接池)
@@ -15,6 +15,7 @@
   
 ### 以后的feature
   - 集群架构
+  - web flux (Netty作为容器)
   
 ### WebUI
 参见：https://github.com/shenlanAZ/accelerator_ui

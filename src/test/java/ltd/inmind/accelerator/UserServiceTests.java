@@ -26,8 +26,7 @@ public class UserServiceTests {
         user.setPassword("123456");
         //user.setEmail("123@321.com");
 
-        System.out.println(userService.signUp(user));
-
+        userService.signUp(user);
 
     }
 

@@ -2,7 +2,8 @@ package ltd.inmind.accelerator.service.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
-import ltd.inmind.accelerator.constants.LoginConst.SignUpStatusEnum;
+import ltd.inmind.accelerator.constants.PlatformEnum;
+import ltd.inmind.accelerator.exception.AcceleratorException;
 import ltd.inmind.accelerator.mapper.UserMapper;
 import ltd.inmind.accelerator.model.User;
 import ltd.inmind.accelerator.service.UserService;
@@ -24,16 +25,18 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public SignUpStatusEnum signUp(User user) {
+    public void signUp(User user) {
+        User byUsername = getUserByUsername(user.getUsername());
+        if (byUsername != null)
+            throw new AcceleratorException(PlatformEnum.USER_NAME_ALREADY_EXIST);
 
-        try {
+        String password = passwordEncoder.encode(user.getPassword());
 
-            return doSignUp(user);
-        } catch (Exception e) {
+        user.setPassword(password);
 
-            log.error("user service sign up error", e);
-            return SignUpStatusEnum.FAILED;
-        }
+        user.setCreateTime(new Date());
+
+        userMapper.insert(user);
     }
 
     @Override
@@ -43,24 +46,5 @@ public class UserServiceImpl implements UserService {
                 .<User>lambdaQuery()
                 .eq(User::getUsername, username));
     }
-
-    private SignUpStatusEnum doSignUp(User user) {
-
-        User byUsername = getUserByUsername(user.getUsername());
-        if (byUsername != null)
-            return SignUpStatusEnum.USER_NAME_ALREADY_EXIST;
-
-        String password = passwordEncoder.encode(user.getPassword());
-
-        user.setPassword(password);
-
-        user.setCreateTime(new Date());
-
-        userMapper.insert(user);
-
-        return SignUpStatusEnum.SUCCESS;
-    }
-
-
 
 }

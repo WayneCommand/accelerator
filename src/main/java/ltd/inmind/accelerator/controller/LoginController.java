@@ -1,16 +1,13 @@
 package ltd.inmind.accelerator.controller;
 
-import ltd.inmind.accelerator.constants.LoginConst.SignUpStatusEnum;
+import ltd.inmind.accelerator.exception.AcceleratorException;
 import ltd.inmind.accelerator.model.User;
+import ltd.inmind.accelerator.model.dto.ResponseResult;
 import ltd.inmind.accelerator.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 
 @RestController
@@ -27,29 +24,16 @@ public class LoginController {
      * @return
      */
     @PostMapping("/signUp")
-    public Map<String, String> signUp(User user) {
+    public ResponseResult signUp(User user) {
 
-        SignUpStatusEnum signUpStatusEnum = userService.signUp(user);
-        Map<String, String> result = new HashMap<>();
+        try {
 
-        switch (signUpStatusEnum) {
-            case USER_NAME_ALREADY_EXIST:{
-                result.put("status", SignUpStatusEnum.FAILED.getValue());
-                result.put("message", "用户名已存在");
-                break;
-            }
+            userService.signUp(user);
+            return ResponseResult.success();
 
-            case FAILED:{
-                result.put("status", SignUpStatusEnum.FAILED.getValue());
-                break;
-            }
-            case SUCCESS:{
-                result.put("status", SignUpStatusEnum.SUCCESS.getValue());
-                break;
-            }
+        } catch (AcceleratorException e) {
+            return ResponseResult.failure(e);
         }
-
-        return result;
     }
 
     /**
@@ -58,10 +42,9 @@ public class LoginController {
      * @return
      */
     @PostMapping("/refreshJwtToken")
-    public Map<String, String> refreshJwtToken(String token) {
+    public void refreshJwtToken(String token) {
 
         //TODO 续期逻辑
-        return Collections.emptyMap();
     }
 
 }

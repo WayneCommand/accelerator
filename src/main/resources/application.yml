@@ -12,3 +12,10 @@ spring:
     username: root
     password: root
     type: com.zaxxer.hikari.HikariDataSource
+
+  http:
+    converters:
+      preferred-json-mapper: gson
+
+  gson:
+    date-format: yyyy-MM-dd HH:mm:ss

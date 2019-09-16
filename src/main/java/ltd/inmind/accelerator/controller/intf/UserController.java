@@ -3,6 +3,8 @@ package ltd.inmind.accelerator.controller.intf;
 import ltd.inmind.accelerator.model.intf.User;
 import ltd.inmind.accelerator.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,14 +23,15 @@ public class UserController {
     public User userinfo(HttpServletResponse response) {
         User user = new User();
 
-        user.setuId(1);
-        user.setEmail("shenlanluck@gmail.com");
-        user.setUsername("shenlan");
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        //response.setHeader("Cache-Control", "no-store");
-        //response.setHeader("Pragma", "no-cache");
+        ltd.inmind.accelerator.model.User userByUsername = userService.getUserByUsername(authentication.getName());
 
-        //TODO real user info
+        user.setUsername(userByUsername.getUsername());
+
+        user.setuId(userByUsername.getUId());
+
+        user.setEmail(userByUsername.getEmail());
         return user;
 
     }

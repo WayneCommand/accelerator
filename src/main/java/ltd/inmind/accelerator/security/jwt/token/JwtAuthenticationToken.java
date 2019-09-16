@@ -1,6 +1,7 @@
 package ltd.inmind.accelerator.security.jwt.token;
 
 import lombok.Getter;
+import ltd.inmind.accelerator.utils.JwtUtil;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 
@@ -14,16 +15,7 @@ public class JwtAuthenticationToken extends AbstractAuthenticationToken {
     public JwtAuthenticationToken(String token, Collection<? extends GrantedAuthority> authorities) {
         super(authorities);
         this.token = token;
-    }
-
-    /**
-     * Creates a token with the supplied array of authorities.
-     *
-     * @param authorities the collection of <tt>GrantedAuthority</tt>s for the principal
-     *                    represented by this authentication object.
-     */
-    public JwtAuthenticationToken(Collection<? extends GrantedAuthority> authorities) {
-        super(authorities);
+        super.setAuthenticated(true);
     }
 
     @Override
@@ -33,6 +25,6 @@ public class JwtAuthenticationToken extends AbstractAuthenticationToken {
 
     @Override
     public Object getPrincipal() {
-        return token;
+        return JwtUtil.getClaim(token, JwtUtil.JWT_USERNAME);
     }
 }

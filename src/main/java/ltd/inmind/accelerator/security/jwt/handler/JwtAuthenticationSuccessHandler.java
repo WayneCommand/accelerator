@@ -26,10 +26,14 @@ public class JwtAuthenticationSuccessHandler implements AuthenticationSuccessHan
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         securityContextRepository.saveContext(SecurityContextHolder.getContext(), request, response);
 
+        sendResponse(response);
+
+    }
+
+    private void sendResponse(HttpServletResponse response) throws IOException {
         response.setStatus(HttpStatus.OK.value());
         response.setContentType("application/json;charset=UTF-8");
         response.getWriter().println(gson.toJson(LoginResult.getResult(LoginResult.LoginStatusEnum.SUCCESS)));
-
     }
 
 }

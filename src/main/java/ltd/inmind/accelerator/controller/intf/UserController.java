@@ -9,8 +9,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletResponse;
-
 @RestController
 @RequestMapping("/oauth/2/api")
 public class UserController {
@@ -20,7 +18,7 @@ public class UserController {
 
 
     @GetMapping("/userinfo")
-    public User userinfo(HttpServletResponse response) {
+    public User userinfo() {
         User user = new User();
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

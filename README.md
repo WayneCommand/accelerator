@@ -12,10 +12,10 @@
   - HikariCP(数据库连接池)
   - MariaDB (Aria engine)
   - Oauth2 (oauth2授权服务 还在完善中)
+  - web flux (Netty作为容器)
   
 ### 以后的feature
   - 集群架构
-  - web flux (Netty作为容器)
   
 ### WebUI
 参见：https://github.com/shenlanAZ/accelerator_ui

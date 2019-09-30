@@ -8,8 +8,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletResponse;
-
 @RestController
 @RequestMapping("/oauth/2")
 public class Oauth2Controller {
@@ -26,7 +24,7 @@ public class Oauth2Controller {
      * @return
      */
     @GetMapping("/authorize")
-    public String authorize(String client_id, String response_type, String redirect_uri, String scope, HttpServletResponse response) {
+    public String authorize(String client_id, String response_type, String redirect_uri, String scope) {
         //TODO spring security
 
         //验证client

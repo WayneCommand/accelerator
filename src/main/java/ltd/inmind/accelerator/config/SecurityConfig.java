@@ -19,7 +19,6 @@ public class SecurityConfig {
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
         http
                 .csrf().disable()
-
                 .httpBasic()
 
                 .and()

@@ -36,15 +36,4 @@ public class LoginController {
         }
     }
 
-    /**
-     * jwt token 续期
-     * @param token 将要过期的token
-     * @return
-     */
-    @PostMapping("/refreshJwtToken")
-    public void refreshJwtToken(String token) {
-
-        //TODO 续期逻辑
-    }
-
 }

@@ -3,11 +3,11 @@ package ltd.inmind.accelerator.constants;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class LoginConst {
+public interface LoginConst {
 
-    public static final String AUTHORIZATION_HEADER_NAME = "Authorization";
-    public static final String AUTHORIZATION_PREFIX = "Bearer ";
+    String AUTHORIZATION_HEADER_NAME = "Authorization";
+    String AUTHORIZATION_PREFIX = "Bearer ";
 
-    public static final Map<String, String> TOKEN_SESSION = new ConcurrentHashMap<>();
+    Map<String, String> TOKEN_SESSION = new ConcurrentHashMap<>();
 
 }

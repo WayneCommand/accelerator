@@ -1,6 +1,7 @@
 package ltd.inmind.accelerator.config;
 
-import ltd.inmind.accelerator.security.service.JwtMapReactiveUserDetailsService;
+import lombok.extern.slf4j.Slf4j;
+import ltd.inmind.accelerator.security.service.AcceleratorReactiveUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
@@ -11,6 +12,7 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 import reactor.core.publisher.Mono;
 
 @EnableWebFluxSecurity
+@Slf4j
 public class SecurityConfig {
 
     @Bean
@@ -24,6 +26,7 @@ public class SecurityConfig {
                 .formLogin()
                 .authenticationFailureHandler((webFilterExchange,exception)->{
                     //TODO handler
+                    log.error("login failed.", exception);
                     return Mono.empty();
                 })
 
@@ -36,7 +39,7 @@ public class SecurityConfig {
 
     @Bean
     public ReactiveUserDetailsService reactiveUserDetailsService(){
-        return new JwtMapReactiveUserDetailsService();
+        return new AcceleratorReactiveUserDetailsService();
     }
 
     @Bean

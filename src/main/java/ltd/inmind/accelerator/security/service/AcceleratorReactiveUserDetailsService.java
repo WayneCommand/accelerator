@@ -3,17 +3,13 @@ package ltd.inmind.accelerator.security.service;
 import ltd.inmind.accelerator.model.User;
 import ltd.inmind.accelerator.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
-import org.springframework.security.core.userdetails.MapReactiveUserDetailsService;
-import org.springframework.security.core.userdetails.ReactiveUserDetailsPasswordService;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 
-@EnableWebFluxSecurity
-public class JwtMapReactiveUserDetailsService implements ReactiveUserDetailsService {
+public class AcceleratorReactiveUserDetailsService implements ReactiveUserDetailsService {
 
     @Autowired
     private UserService userService;

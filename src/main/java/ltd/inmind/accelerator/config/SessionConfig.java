@@ -5,6 +5,8 @@ import org.springframework.session.ReactiveMapSessionRepository;
 import org.springframework.session.ReactiveSessionRepository;
 import org.springframework.session.Session;
 import org.springframework.session.config.annotation.web.server.EnableSpringWebSession;
+import org.springframework.web.server.session.HeaderWebSessionIdResolver;
+import org.springframework.web.server.session.WebSessionIdResolver;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,11 +25,12 @@ public class SessionConfig {
     }
 
 
-    /*@Bean //另外基于Header的resolver不能用
+
+    @Bean
     public WebSessionIdResolver webSessionIdResolver() {
         HeaderWebSessionIdResolver resolver = new HeaderWebSessionIdResolver();
         resolver.setHeaderName("X-AUTH-TOKEN");
         return resolver;
-    }*/
+    }
 
 }

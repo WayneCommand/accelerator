@@ -1,6 +1,8 @@
 package ltd.inmind.accelerator.config;
 
+import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
+import ltd.inmind.accelerator.model.vo.LoginResp;
 import ltd.inmind.accelerator.security.service.AcceleratorReactiveUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.buffer.DataBuffer;
@@ -21,6 +23,8 @@ import java.nio.charset.StandardCharsets;
 @Slf4j
 public class SecurityConfig {
 
+    private Gson gson = new Gson();
+
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
         http
@@ -39,9 +43,9 @@ public class SecurityConfig {
                     response.getHeaders()
                             .add("Content-Type", "application/json");
 
-                    String msg = "{\"state\":\"success\"}";
+                    String resp = gson.toJson(LoginResp.success());
 
-                    DataBuffer buffer = response.bufferFactory().wrap(msg.getBytes(StandardCharsets.UTF_8));
+                    DataBuffer buffer = response.bufferFactory().wrap(resp.getBytes(StandardCharsets.UTF_8));
 
                     return response.writeWith(Mono.just(buffer));
                 })
@@ -52,9 +56,9 @@ public class SecurityConfig {
                     response.getHeaders()
                             .add("Content-Type", "application/json");
 
-                    String msg = "{\"state\":\"failed\"}";
+                    String resp = gson.toJson(LoginResp.failed(exception));
 
-                    DataBuffer buffer = response.bufferFactory().wrap(msg.getBytes(StandardCharsets.UTF_8));
+                    DataBuffer buffer = response.bufferFactory().wrap(resp.getBytes(StandardCharsets.UTF_8));
 
                     return response.writeWith(Mono.just(buffer));
                 })

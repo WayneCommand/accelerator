@@ -6,6 +6,7 @@ import ltd.inmind.accelerator.constants.PlatformEnum;
 
 @Getter
 @AllArgsConstructor
+@Deprecated
 public class AcceleratorException extends RuntimeException {
 
     private PlatformEnum platformEnum;

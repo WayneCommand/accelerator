@@ -6,6 +6,7 @@ import ltd.inmind.accelerator.exception.AcceleratorException;
 
 @AllArgsConstructor
 @Builder
+@Deprecated
 public class ResponseResult {
     private boolean isSucceeded;
     private String message;

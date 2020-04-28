@@ -8,7 +8,6 @@ import ltd.inmind.accelerator.mapper.UserMapper;
 import ltd.inmind.accelerator.model.User;
 import ltd.inmind.accelerator.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +17,8 @@ import java.util.Date;
 @Slf4j
 public class UserServiceImpl implements UserService {
 
-    private PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private UserMapper userMapper;

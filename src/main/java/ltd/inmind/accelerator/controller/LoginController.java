@@ -1,9 +1,9 @@
 package ltd.inmind.accelerator.controller;
 
+import ltd.inmind.accelerator.constants.ExceptionConst;
 import ltd.inmind.accelerator.exception.AcceleratorException;
 import ltd.inmind.accelerator.model.User;
-import ltd.inmind.accelerator.model.dto.ResponseResult;
-import ltd.inmind.accelerator.model.vo.LoginLookupResp;
+import ltd.inmind.accelerator.model.vo.DataResponse;
 import ltd.inmind.accelerator.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,26 +26,39 @@ public class LoginController {
      * @return
      */
     @PostMapping("/signUp")
-    public ResponseResult signUp(User user) {
+    public DataResponse signUp(User user) {
 
         try {
 
             userService.signUp(user);
-            return ResponseResult.success();
+
+            return new DataResponse()
+                    .success();
 
         } catch (AcceleratorException e) {
-            return ResponseResult.failure(e);
+
+            String msg = ExceptionConst.CODE_MSG.get(e.getCode());
+
+            return new DataResponse()
+                    .failed()
+                    .msg(msg);
         }
     }
 
     @GetMapping("/lookup")
-    public LoginLookupResp lookup(User user) {
+    public DataResponse lookup(User user) {
         User byUsername = userService.getUserByUsername(user.getUsername());
 
         if (byUsername == null) {
-            return LoginLookupResp.notExist("我们未找到您的账户, 请检查您的账户名。");
+
+            return new DataResponse()
+                    .success()
+                    .data("isExist", "false")
+                    .msg("我们未找到您的账户, 请检查您的账户名。");
         }
 
-        return LoginLookupResp.exist();
+        return new DataResponse()
+                .success()
+                .data("isExist", "true");
     }
 }

@@ -2,7 +2,6 @@ package ltd.inmind.accelerator.service.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
-import ltd.inmind.accelerator.constants.PlatformEnum;
 import ltd.inmind.accelerator.exception.AcceleratorException;
 import ltd.inmind.accelerator.mapper.UserMapper;
 import ltd.inmind.accelerator.model.User;
@@ -12,6 +11,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+
+import static ltd.inmind.accelerator.constants.ExceptionConst.USER_ALREADY_EXIST;
 
 @Service
 @Slf4j
@@ -28,7 +29,7 @@ public class UserServiceImpl implements UserService {
     public void signUp(User user) {
         User byUsername = getUserByUsername(user.getUsername());
         if (byUsername != null)
-            throw new AcceleratorException(PlatformEnum.USER_NAME_ALREADY_EXIST);
+            throw new AcceleratorException(USER_ALREADY_EXIST);
 
         String password = passwordEncoder.encode(user.getPassword());
 

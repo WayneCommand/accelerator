@@ -1,9 +1,13 @@
 package ltd.inmind.accelerator.security.handler;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
-import ltd.inmind.accelerator.model.vo.LoginResp;
+import lombok.AllArgsConstructor;
+import ltd.inmind.accelerator.model.vo.DataResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.server.WebFilterExchange;
@@ -13,9 +17,10 @@ import reactor.core.publisher.Mono;
 import java.nio.charset.StandardCharsets;
 
 
+@AllArgsConstructor
 public class AuthenticationSuccessHandler implements ServerAuthenticationSuccessHandler {
 
-    private Gson gson = new Gson();
+    private Gson gson;
 
     @Override
     public Mono<Void> onAuthenticationSuccess(WebFilterExchange webFilterExchange, Authentication authentication) {
@@ -25,7 +30,10 @@ public class AuthenticationSuccessHandler implements ServerAuthenticationSuccess
         response.getHeaders()
                 .add("Content-Type", "application/json");
 
-        String resp = gson.toJson(LoginResp.success());
+        DataResponse dataResponse = new DataResponse()
+                .success();
+
+        String resp = gson.toJson(dataResponse);
 
         DataBuffer buffer = response.bufferFactory().wrap(resp.getBytes(StandardCharsets.UTF_8));
 

@@ -1,13 +1,19 @@
 package ltd.inmind.accelerator.exception;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import ltd.inmind.accelerator.constants.PlatformEnum;
 
-@Getter
-@AllArgsConstructor
-@Deprecated
+import lombok.Data;
+
+@Data
 public class AcceleratorException extends RuntimeException {
 
-    private PlatformEnum platformEnum;
+    private String msg;
+    private String code;
+
+    public AcceleratorException() {
+
+    }
+
+    public AcceleratorException(String _code) {
+        this.code = _code;
+    }
 }

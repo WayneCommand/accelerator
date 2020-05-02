@@ -1,9 +1,11 @@
 package ltd.inmind.accelerator.config;
 
+import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import ltd.inmind.accelerator.security.handler.AuthenticationFailureHandler;
 import ltd.inmind.accelerator.security.handler.AuthenticationSuccessHandler;
 import ltd.inmind.accelerator.security.service.AcceleratorReactiveUserDetailsService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
@@ -17,6 +19,9 @@ import org.springframework.security.web.server.context.WebSessionServerSecurityC
 @Slf4j
 public class SecurityConfig {
 
+    @Autowired
+    private Gson gson;
+
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
         http
@@ -28,8 +33,8 @@ public class SecurityConfig {
 
                 .and()
                 .formLogin()
-                .authenticationSuccessHandler(new AuthenticationSuccessHandler())
-                .authenticationFailureHandler(new AuthenticationFailureHandler())
+                .authenticationSuccessHandler(new AuthenticationSuccessHandler(gson))
+                .authenticationFailureHandler(new AuthenticationFailureHandler(gson))
 
                 .and()
                 .authorizeExchange()
@@ -40,7 +45,6 @@ public class SecurityConfig {
                 .authorizeExchange()
                 .anyExchange()
                 .authenticated();
-
 
         return http.build();
     }

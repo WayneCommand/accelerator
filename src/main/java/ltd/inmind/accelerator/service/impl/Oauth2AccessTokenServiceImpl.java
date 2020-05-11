@@ -2,9 +2,9 @@ package ltd.inmind.accelerator.service.impl;
 
 import ltd.inmind.accelerator.mapper.Oauth2AccessTokenMapper;
 import ltd.inmind.accelerator.model.Oauth2AccessToken;
-import ltd.inmind.accelerator.model.User;
+import ltd.inmind.accelerator.model.po.UserAccount;
+import ltd.inmind.accelerator.service.IUserAccountService;
 import ltd.inmind.accelerator.service.Oauth2AccessTokenService;
-import ltd.inmind.accelerator.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,19 +17,15 @@ public class Oauth2AccessTokenServiceImpl implements Oauth2AccessTokenService {
     private Oauth2AccessTokenMapper oauth2AccessTokenMapper;
 
     @Autowired
-    private UserService userService;
+    private IUserAccountService userAccountService;
 
     @Override
     public void addAccessTokenRecord(Integer clientPrimaryId, String username, String accessToken) {
+        UserAccount byAccount = userAccountService.getByAccount(username);
 
         Oauth2AccessToken oauth2AccessToken = new Oauth2AccessToken();
-
-        User userByUsername = userService.getUserByUsername(username);
-
-        oauth2AccessToken.setuId(userByUsername.getUId());
-
+        oauth2AccessToken.setUId(byAccount.getUId());
         oauth2AccessToken.setAccessToken(accessToken);
-
         oauth2AccessToken.setClientPrimaryId(clientPrimaryId);
         oauth2AccessToken.setCreateTime(new Date());
 

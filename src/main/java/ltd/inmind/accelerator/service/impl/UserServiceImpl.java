@@ -1,51 +1,44 @@
 package ltd.inmind.accelerator.service.impl;
 
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
-import ltd.inmind.accelerator.exception.AcceleratorException;
-import ltd.inmind.accelerator.mapper.UserMapper;
-import ltd.inmind.accelerator.model.User;
-import ltd.inmind.accelerator.service.UserService;
+import ltd.inmind.accelerator.model.po.UserAccount;
+import ltd.inmind.accelerator.model.po.UserProfile;
+import ltd.inmind.accelerator.service.IUserAccountService;
+import ltd.inmind.accelerator.service.IUserProfileService;
+import ltd.inmind.accelerator.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Date;
-
-import static ltd.inmind.accelerator.constants.ExceptionConst.USER_ALREADY_EXIST;
 
 @Service
 @Slf4j
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements IUserService {
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private IUserAccountService userAccountService;
 
     @Autowired
-    private UserMapper userMapper;
-
+    private IUserProfileService userProfileService;
 
     @Override
-    public void signUp(User user) {
-        User byUsername = getUserByUsername(user.getUsername());
-        if (byUsername != null)
-            throw new AcceleratorException(USER_ALREADY_EXIST);
+    public void signUp(String account,String password) {
+        UserAccount userAccount = new UserAccount();
+        userAccount.setAccount(account);
+        userAccount.setPassword(password);
 
-        String password = passwordEncoder.encode(user.getPassword());
-
-        user.setPassword(password);
-
-        user.setCreateTime(new Date());
-
-        userMapper.insert(user);
+        userAccountService.register(userAccount);
     }
 
     @Override
-    public User getUserByUsername(String username) {
+    public UserProfile getProfileByAccount(String account) {
+        UserAccount userAccount = userAccountService.getByAccount(account);
+        if (userAccount == null)
+            return null;
 
-        return userMapper.selectOne(Wrappers
-                .<User>lambdaQuery()
-                .eq(User::getUsername, username));
+        return userProfileService.getByUId(userAccount.getUId());
     }
 
+    @Override
+    public UserAccount getAccountByAccount(String account) {
+        return userAccountService.getByAccount(account);
+    }
 }

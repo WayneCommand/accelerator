@@ -2,9 +2,9 @@ package ltd.inmind.accelerator.controller;
 
 import ltd.inmind.accelerator.constants.ExceptionConst;
 import ltd.inmind.accelerator.exception.AcceleratorException;
-import ltd.inmind.accelerator.model.User;
+import ltd.inmind.accelerator.model.po.UserAccount;
 import ltd.inmind.accelerator.model.vo.DataResponse;
-import ltd.inmind.accelerator.service.UserService;
+import ltd.inmind.accelerator.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,20 +17,21 @@ import org.springframework.web.bind.annotation.RestController;
 public class LoginController {
 
     @Autowired
-    private UserService userService;
+    private IUserService userService;
 
     /**
      * 注册接口
      *
-     * @param user 用户名 密码
+     * @param account 用户名
+     * @param password 密码
      * @return
      */
     @PostMapping("/signUp")
-    public DataResponse signUp(User user) {
+    public DataResponse signUp(String account, String password) {
 
         try {
 
-            userService.signUp(user);
+            userService.signUp(account, password);
 
             return new DataResponse()
                     .success();
@@ -46,10 +47,10 @@ public class LoginController {
     }
 
     @GetMapping("/lookup")
-    public DataResponse lookup(User user) {
-        User byUsername = userService.getUserByUsername(user.getUsername());
+    public DataResponse lookup(String account) {
+        UserAccount userAccount = userService.getAccountByAccount(account);
 
-        if (byUsername == null) {
+        if (userAccount == null) {
 
             return new DataResponse()
                     .success()

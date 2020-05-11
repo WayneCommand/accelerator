@@ -1,11 +1,10 @@
 package ltd.inmind.accelerator.controller.intf;
 
 import ltd.inmind.accelerator.model.intf.User;
-import ltd.inmind.accelerator.service.UserService;
+import ltd.inmind.accelerator.model.po.UserProfile;
+import ltd.inmind.accelerator.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.ReactiveSecurityContextHolder;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,22 +14,19 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
     @Autowired
-    private UserService userService;
+    private IUserService userService;
 
 
     @GetMapping("/userinfo")
     public User userinfo(Authentication authentication) {
+        UserProfile userProfile = userService.getProfileByAccount(authentication.getName());
+
         User user = new User();
 
-        ltd.inmind.accelerator.model.User userByUsername = userService.getUserByUsername(authentication.getName());
+        user.setUId(userProfile.getUId());
+        user.setUsername(userProfile.getNickname());
 
-        user.setUsername(userByUsername.getUsername());
-
-        user.setuId(userByUsername.getUId());
-
-        user.setEmail(userByUsername.getEmail());
         return user;
-
     }
 
 

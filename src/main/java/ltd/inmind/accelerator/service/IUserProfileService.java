@@ -5,4 +5,6 @@ import ltd.inmind.accelerator.model.po.UserProfile;
 public interface IUserProfileService {
 
     UserProfile getByUId(Long uId);
+
+    void register(UserProfile userProfile);
 }

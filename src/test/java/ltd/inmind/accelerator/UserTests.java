@@ -5,6 +5,7 @@ import ltd.inmind.accelerator.mapper.UserAccountMapper;
 import ltd.inmind.accelerator.model.Oauth2Client;
 import ltd.inmind.accelerator.model.po.UserAccount;
 import ltd.inmind.accelerator.service.IUserAccountService;
+import ltd.inmind.accelerator.service.IUserService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,9 @@ public class UserTests {
     private IUserAccountService userAccountService;
 
     @Autowired
+    private IUserService userService;
+
+    @Autowired
     private Oauth2ClientMapper oauth2ClientMapper;
 
     @Test
@@ -37,11 +41,8 @@ public class UserTests {
 
     @Test
     public void testRegister() {
-        UserAccount userAccount = new UserAccount();
+        userService.signUp("shenlan","123456");
 
-        userAccountService.register(userAccount);
-
-        System.out.println(userAccount);
     }
 
 }

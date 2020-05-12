@@ -4,7 +4,7 @@ import ltd.inmind.accelerator.model.po.UserAccount;
 
 public interface IUserAccountService {
 
-    UserAccount getByAccount(String name);
+    UserAccount getByAccount(String account);
 
     /**
      * 注册用户

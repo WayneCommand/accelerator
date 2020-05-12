@@ -7,18 +7,15 @@
 ### 服务基于springboot 目前集成了
   
   - web flux (Netty作为容器)
-  - spring security （用户认证 目前没有权限相关的业务）
+  - spring security （权限框架）
   - spring session (用于管理session 非常方便拓展为无状态服务)
-  - mybatis
   - mybatis-plus (简化开发的神器)
   - HikariCP(数据库连接池)
-  - MariaDB (Aria engine)
   - Oauth2 (oauth2授权服务 还在完善中)
   
 ### 以后的feature
   - 集群架构
   - JWT（Java Web Token）
-  - Spring session header resolver（目前用起来有问题）
   
 ### WebUI
 参见：https://github.com/shenlanAZ/accelerator_ui

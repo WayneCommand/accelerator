@@ -1,21 +1,19 @@
-/*
- Navicat MySQL Data Transfer
-
- Source Server         : MariaDB_localhost
- Source Server Type    : MariaDB
- Source Server Version : 100315
- Source Host           : localhost:3306
- Source Schema         : mycloud
-
- Target Server Type    : MariaDB
- Target Server Version : 100315
- File Encoding         : 65001
-
- Date: 29/05/2019 22:15:40
-*/
-
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
+
+-- ----------------------------
+-- Table structure for t_oauth2_access_token
+-- ----------------------------
+DROP TABLE IF EXISTS `t_oauth2_access_token`;
+CREATE TABLE `t_oauth2_access_token`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `access_token` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '颁发的token',
+  `u_id` int(11) NOT NULL COMMENT '系统内的用户id',
+  `client_primary_id` int(11) NOT NULL,
+  `expired_time` datetime(0) NULL DEFAULT NULL COMMENT '过期时间',
+  `create_time` datetime(0) NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE
+)
 
 -- ----------------------------
 -- Table structure for t_oauth2_client
@@ -29,6 +27,6 @@ CREATE TABLE `t_oauth2_client`  (
   `callback_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '回调地址',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `clinet_id_unique`(`client_id`) USING BTREE COMMENT '客户端ID的唯一索引'
-) ENGINE = Aria AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin PAGE_CHECKSUM = 1 ROW_FORMAT = Page;
+)
 
 SET FOREIGN_KEY_CHECKS = 1;

@@ -9,8 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-
 import static ltd.inmind.accelerator.constants.ExceptionConst.USER_ALREADY_EXIST;
 
 @Service
@@ -24,10 +22,10 @@ public class UserAccountServiceImpl implements IUserAccountService {
 
 
     @Override
-    public UserAccount getByAccount(String name) {
+    public UserAccount getByAccount(String account) {
 
         return userAccountMapper.selectOne(Wrappers.<UserAccount>lambdaQuery()
-                .eq(UserAccount::getAccount, name));
+                .eq(UserAccount::getAccount, account));
     }
 
     @Override
@@ -40,7 +38,6 @@ public class UserAccountServiceImpl implements IUserAccountService {
         String password = passwordEncoder.encode(userAccount.getPassword());
         userAccount.setPassword(password);
 
-        userAccount.setCreateTime(new Date());
         userAccount.setPhoneToLogin(0L);
         userAccount.setTwoStepVerify(0L);
 

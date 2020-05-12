@@ -47,8 +47,8 @@ public class LoginController {
     }
 
     @GetMapping("/lookup")
-    public DataResponse lookup(String account) {
-        UserAccount userAccount = userService.getAccountByAccount(account);
+    public DataResponse lookup(String username) {
+        UserAccount userAccount = userService.getAccountByAccount(username);
 
         if (userAccount == null) {
 

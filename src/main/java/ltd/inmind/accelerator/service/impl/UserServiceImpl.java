@@ -3,12 +3,18 @@ package ltd.inmind.accelerator.service.impl;
 import lombok.extern.slf4j.Slf4j;
 import ltd.inmind.accelerator.model.po.UserAccount;
 import ltd.inmind.accelerator.model.po.UserProfile;
+import ltd.inmind.accelerator.model.vo.MyInfo;
 import ltd.inmind.accelerator.service.IUserAccountService;
 import ltd.inmind.accelerator.service.IUserProfileService;
 import ltd.inmind.accelerator.service.IUserService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -47,5 +53,33 @@ public class UserServiceImpl implements IUserService {
     @Override
     public UserAccount getAccountByAccount(String account) {
         return userAccountService.getByAccount(account);
+    }
+
+    @Override
+    public MyInfo getMyInfo(String account) {
+        MyInfo myInfo = new MyInfo();
+
+        UserAccount userAccount = userAccountService.getByAccount(account);
+
+        UserProfile userProfile = userProfileService.getByUId(userAccount.getUId());
+
+        myInfo.setUserProfile(userProfile);
+
+        List<String> emails = Stream.of(userAccount.getEmail(),
+                userAccount.getRecoveryEmail())
+                .filter(StringUtils::isNotBlank)
+                .collect(Collectors.toList());
+
+        myInfo.setEmails(emails);
+
+        List<String> phones = Stream.of(userAccount.getPhone())
+                .filter(StringUtils::isNotBlank)
+                .collect(Collectors.toList());
+
+        myInfo.setPhones(phones);
+
+        myInfo.setPasswordModifyTime(userAccount.getPasswordModifyTime());
+
+        return myInfo;
     }
 }

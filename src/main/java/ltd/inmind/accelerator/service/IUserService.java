@@ -2,6 +2,7 @@ package ltd.inmind.accelerator.service;
 
 import ltd.inmind.accelerator.model.po.UserAccount;
 import ltd.inmind.accelerator.model.po.UserProfile;
+import ltd.inmind.accelerator.model.vo.MyInfo;
 
 public interface IUserService {
 
@@ -14,5 +15,7 @@ public interface IUserService {
     UserProfile getProfileByAccount(String account);
 
     UserAccount getAccountByAccount(String account);
+
+    MyInfo getMyInfo(String account);
 
 }

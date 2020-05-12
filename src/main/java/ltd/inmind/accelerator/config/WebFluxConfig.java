@@ -18,7 +18,7 @@ public class WebFluxConfig implements WebFluxConfigurer {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         //TODO 在1.0的时候解决origin的问题
         corsConfiguration.addAllowedOrigin("*");
-        //corsConfiguration.addAllowedHeader("*");
+        corsConfiguration.addAllowedHeader("*");
         corsConfiguration.addAllowedMethod("*");
         corsConfiguration.addExposedHeader("X-AUTH-TOKEN");
 

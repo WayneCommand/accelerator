@@ -25,4 +25,12 @@ public class UserController {
                 .success()
                 .data("info", userService.getMyInfo(principal.getUsername()));
     }
+
+    @GetMapping("my_safety")
+    public DataResponse mySafety(Authentication authentication) {
+
+        return new DataResponse()
+                .success()
+                .data("safety", userService.getMySafety(authentication.getName()));
+    }
 }

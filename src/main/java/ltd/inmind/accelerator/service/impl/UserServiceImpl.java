@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import ltd.inmind.accelerator.model.po.UserAccount;
 import ltd.inmind.accelerator.model.po.UserProfile;
 import ltd.inmind.accelerator.model.vo.MyInfo;
+import ltd.inmind.accelerator.model.vo.MySafety;
 import ltd.inmind.accelerator.service.IUserAccountService;
 import ltd.inmind.accelerator.service.IUserProfileService;
 import ltd.inmind.accelerator.service.IUserService;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -81,5 +83,20 @@ public class UserServiceImpl implements IUserService {
         myInfo.setPasswordModifyTime(userAccount.getPasswordModifyTime());
 
         return myInfo;
+    }
+
+    @Override
+    public MySafety getMySafety(String account) {
+        MySafety mySafety = new MySafety();
+
+        UserAccount userAccount = userAccountService.getByAccount(account);
+        userAccount.setPassword(null);
+        userAccount.setCreateTime(null);
+        userAccount.setModifyTime(null);
+
+        mySafety.setUserAccount(userAccount);
+        mySafety.setDeviceTokenList(Collections.emptyList());
+
+        return mySafety;
     }
 }

@@ -2,6 +2,7 @@ package ltd.inmind.accelerator.service;
 
 import ltd.inmind.accelerator.model.po.UserAccount;
 import ltd.inmind.accelerator.model.po.UserProfile;
+import ltd.inmind.accelerator.model.vo.MyHomePage;
 import ltd.inmind.accelerator.model.vo.MyInfo;
 import ltd.inmind.accelerator.model.vo.MySafety;
 
@@ -21,4 +22,5 @@ public interface IUserService {
 
     MySafety getMySafety(String account);
 
+    MyHomePage getMyHomePage(String account);
 }

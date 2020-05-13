@@ -1,6 +1,7 @@
 package ltd.inmind.accelerator.controller;
 
 import ltd.inmind.accelerator.model.vo.DataResponse;
+import ltd.inmind.accelerator.model.vo.MyHomePage;
 import ltd.inmind.accelerator.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -32,5 +33,15 @@ public class UserController {
         return new DataResponse()
                 .success()
                 .data("safety", userService.getMySafety(authentication.getName()));
+    }
+
+    @GetMapping("my_home_page")
+    public DataResponse myHomePage(Authentication authentication) {
+
+        MyHomePage myHomePage = userService.getMyHomePage(authentication.getName());
+
+        return new DataResponse()
+                .success()
+                .data("homePage", myHomePage);
     }
 }

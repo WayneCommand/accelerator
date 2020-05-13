@@ -3,6 +3,7 @@ package ltd.inmind.accelerator.service.impl;
 import lombok.extern.slf4j.Slf4j;
 import ltd.inmind.accelerator.model.po.UserAccount;
 import ltd.inmind.accelerator.model.po.UserProfile;
+import ltd.inmind.accelerator.model.vo.MyHomePage;
 import ltd.inmind.accelerator.model.vo.MyInfo;
 import ltd.inmind.accelerator.model.vo.MySafety;
 import ltd.inmind.accelerator.service.IUserAccountService;
@@ -98,5 +99,25 @@ public class UserServiceImpl implements IUserService {
         mySafety.setDeviceTokenList(Collections.emptyList());
 
         return mySafety;
+    }
+
+    @Override
+    public MyHomePage getMyHomePage(String account) {
+        UserAccount userAccount = userAccountService.getByAccount(account);
+
+        UserProfile userProfile = userProfileService.getByUId(userAccount.getUId());
+
+        if (StringUtils.isBlank(userProfile.getNickname())){
+            userProfile.setNickname(userAccount.getAccount());
+        }
+
+        userProfile.setCreateTime(null);
+        userProfile.setModifyTime(null);
+
+        MyHomePage homePage = new MyHomePage();
+        homePage.setUserProfile(userProfile);
+        homePage.setSecurityIssues(Collections.emptyList());
+
+        return homePage;
     }
 }

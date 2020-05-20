@@ -23,4 +23,10 @@ public interface IUserService {
     MySafety getMySafety(String account);
 
     MyHomePage getMyHomePage(String account);
+
+    void updateUserProfile(UserProfile userProfile, String account);
+
+    Boolean verifyPassword(String account, String password);
+
+    void changePassword(String account, String password);
 }

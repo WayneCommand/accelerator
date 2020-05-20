@@ -6,6 +6,7 @@ import java.util.Map;
 public interface ExceptionConst {
 
     String USER_ALREADY_EXIST = "LOGIN.USER_ALREADY_EXIST"; //用户已存在
+    String USER_NOT_EXIST = "USER.USER_NOT_EXIST";
     String SYSTEM_BUG = "SYS.ERROR";
 
 
@@ -13,6 +14,7 @@ public interface ExceptionConst {
     Map<String, String> CODE_MSG = new HashMap<String, String>() {{
         put("LOGIN.USER_ALREADY_EXIST", "用户已存在。");
         put("SYS.ERROR", "系统错误。");
+        put("USER.USER_NOT_EXIST", "用户不存在");
     }};
 
 

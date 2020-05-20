@@ -11,4 +11,8 @@ public interface IUserAccountService {
      * @param userAccount
      */
     void register(UserAccount userAccount);
+
+    Boolean verifyPassword(String account, String password);
+
+    void changePassword(String account, String password);
 }

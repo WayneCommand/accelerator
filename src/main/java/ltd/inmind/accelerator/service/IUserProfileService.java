@@ -7,4 +7,6 @@ public interface IUserProfileService {
     UserProfile getByUId(Long uId);
 
     void register(UserProfile userProfile);
+
+    void updateProfile(UserProfile userProfile);
 }

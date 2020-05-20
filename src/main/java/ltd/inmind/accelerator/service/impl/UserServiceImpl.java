@@ -120,4 +120,25 @@ public class UserServiceImpl implements IUserService {
 
         return homePage;
     }
+
+    @Override
+    public void updateUserProfile(UserProfile userProfile, String account) {
+        UserAccount userAccount = userAccountService.getByAccount(account);
+
+        userProfile.setUId(userAccount.getUId());
+
+        userProfileService.updateProfile(userProfile);
+    }
+
+    @Override
+    public Boolean verifyPassword(String account, String password) {
+
+        return userAccountService.verifyPassword(account, password);
+    }
+
+    @Override
+    public void changePassword(String account, String password) {
+
+        userAccountService.changePassword(account, password);
+    }
 }

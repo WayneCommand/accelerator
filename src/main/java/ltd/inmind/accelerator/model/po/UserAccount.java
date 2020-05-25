@@ -20,7 +20,7 @@ public class UserAccount {
 
   private String recoveryEmail;
 
-  private String phone;
+  private String recoveryPhone;
 
   private Long phoneToLogin;
 

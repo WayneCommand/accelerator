@@ -6,9 +6,12 @@ import ltd.inmind.accelerator.model.po.UserProfile;
 import ltd.inmind.accelerator.model.vo.MyHomePage;
 import ltd.inmind.accelerator.model.vo.MyInfo;
 import ltd.inmind.accelerator.model.vo.MySafety;
+import ltd.inmind.accelerator.model.vo.VerifyCode;
 import ltd.inmind.accelerator.service.IUserAccountService;
 import ltd.inmind.accelerator.service.IUserProfileService;
 import ltd.inmind.accelerator.service.IUserService;
+import ltd.inmind.accelerator.utils.KVPlusMap;
+import ltd.inmind.accelerator.utils.RandomUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,6 +31,8 @@ public class UserServiceImpl implements IUserService {
 
     @Autowired
     private IUserProfileService userProfileService;
+
+    private KVPlusMap<String, String> verifyCache = new KVPlusMap<>();
 
     @Override
     @Transactional
@@ -68,14 +73,16 @@ public class UserServiceImpl implements IUserService {
 
         myInfo.setUserProfile(userProfile);
 
-        List<String> emails = Stream.of(userAccount.getEmail(),
+        List<String> emails = Stream.of(userProfile.getEmail(),
+                userAccount.getEmail(),
                 userAccount.getRecoveryEmail())
                 .filter(StringUtils::isNotBlank)
                 .collect(Collectors.toList());
 
         myInfo.setEmails(emails);
 
-        List<String> phones = Stream.of(userAccount.getPhone())
+        List<String> phones = Stream.of(userProfile.getPhone(),
+                userAccount.getRecoveryPhone())
                 .filter(StringUtils::isNotBlank)
                 .collect(Collectors.toList());
 
@@ -140,5 +147,54 @@ public class UserServiceImpl implements IUserService {
     public void changePassword(String account, String password) {
 
         userAccountService.changePassword(account, password);
+    }
+
+    @Override
+    public List<VerifyCode> generateVerifyCode(String account, String businessLine) {
+
+        List<VerifyCode> codeList = Stream.iterate(1, seq -> seq + 1)
+                .limit(4)
+                .map(seq -> getVerifyCode(seq, 6))
+                .collect(Collectors.toList());
+
+        //FIXME 总是取出第一个作为有效的验证码
+        VerifyCode verifyCode = codeList.get(0);
+        verifyCache.put(businessLine + "_" + account,
+                verifyCode.getSeq() + "_" + verifyCode.getCode().replace("\\s*", ""),
+                5 * 60 * 1000);
+
+        return codeList;
+    }
+
+    private VerifyCode getVerifyCode(long seq,long length){
+        String number = RandomUtil.number(length);
+
+        String code = StringUtils.join(number.split(""), " ");
+
+        VerifyCode verifyCode = new VerifyCode();
+        verifyCode.setSeq(seq);
+        verifyCode.setCode(code);
+
+        return verifyCode;
+    }
+
+    @Override
+    public Boolean testVerifyCode(VerifyCode verifyCode, String account, String businessLine) {
+
+        String key = businessLine + "_" + account;
+        String val = verifyCode.getSeq() + "_" + verifyCode.getCode().replace("\\s*", "");
+        String code = verifyCache.get(key);
+
+        if (code == null)
+            return false;
+
+        return code.equals(val);
+
+    }
+
+    @Override
+    public void updateUserAccount(UserAccount userAccount) {
+
+        userAccountService.updateUserAccount(userAccount);
     }
 }

@@ -25,6 +25,10 @@ public class DataResponse {
     }
 
 
+    /**
+     * 这里的失败如无特殊情况 指的是业务失败
+     * 比如说密码不匹配
+     */
     public DataResponse failed() {
         data.put(STATE, STATE_FAILED);
         return this;

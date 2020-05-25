@@ -73,4 +73,10 @@ public class UserAccountServiceImpl implements IUserAccountService {
         userAccountMapper.update(userAccount, Wrappers.<UserAccount>lambdaQuery()
                 .eq(UserAccount::getUId, _userAccount.getUId()));
     }
+
+    @Override
+    public void updateUserAccount(UserAccount userAccount) {
+        userAccountMapper.update(userAccount, Wrappers.<UserAccount>lambdaQuery()
+                .eq(UserAccount::getAccount, userAccount.getAccount()));
+    }
 }

@@ -19,6 +19,10 @@ public class UserProfile {
 
   private String avatar;
 
+  private String email;
+
+  private String phone;
+
   private String theme;
 
   @TableField(fill = FieldFill.INSERT)

@@ -15,4 +15,6 @@ public interface IUserAccountService {
     Boolean verifyPassword(String account, String password);
 
     void changePassword(String account, String password);
+
+    void updateUserAccount(UserAccount userAccount);
 }

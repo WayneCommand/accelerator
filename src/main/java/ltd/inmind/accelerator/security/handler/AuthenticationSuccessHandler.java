@@ -1,13 +1,10 @@
 package ltd.inmind.accelerator.security.handler;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import lombok.AllArgsConstructor;
 import ltd.inmind.accelerator.model.vo.DataResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.server.WebFilterExchange;
@@ -15,6 +12,9 @@ import org.springframework.security.web.server.authentication.ServerAuthenticati
 import reactor.core.publisher.Mono;
 
 import java.nio.charset.StandardCharsets;
+
+import static ltd.inmind.accelerator.constants.SecurityConst.AUTHENTICATION_HEADER;
+import static ltd.inmind.accelerator.constants.SecurityConst.TOKEN_ATTR_NAME;
 
 
 @AllArgsConstructor
@@ -24,11 +24,10 @@ public class AuthenticationSuccessHandler implements ServerAuthenticationSuccess
 
     @Override
     public Mono<Void> onAuthenticationSuccess(WebFilterExchange webFilterExchange, Authentication authentication) {
-
         ServerHttpResponse response = webFilterExchange.getExchange().getResponse();
         response.setStatusCode(HttpStatus.OK);
-        response.getHeaders()
-                .add("Content-Type", "application/json");
+        response.getHeaders().add("Content-Type", "application/json");
+        response.getHeaders().add(AUTHENTICATION_HEADER, webFilterExchange.getExchange().getAttribute(TOKEN_ATTR_NAME));
 
         DataResponse dataResponse = new DataResponse()
                 .success();

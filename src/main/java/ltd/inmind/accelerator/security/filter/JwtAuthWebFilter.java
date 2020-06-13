@@ -1,23 +1,20 @@
-package ltd.inmind.accelerator.authentication;
+package ltd.inmind.accelerator.security.filter;
 
 import com.google.gson.Gson;
-import ltd.inmind.accelerator.model.vo.DataResponse;
-import ltd.inmind.accelerator.utils.KVPlusMap;
-import org.springframework.core.io.buffer.DataBuffer;
+import ltd.inmind.accelerator.security.handler.AuthenticationFailureHandler;
+import ltd.inmind.accelerator.security.handler.AuthenticationSuccessHandler;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.http.server.reactive.ServerHttpResponse;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.ReactiveAuthenticationManagerResolver;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.web.server.WebFilterExchange;
+import org.springframework.security.web.server.authentication.ServerAuthenticationFailureHandler;
+import org.springframework.security.web.server.authentication.ServerAuthenticationSuccessHandler;
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
@@ -26,8 +23,6 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
-
-import java.nio.charset.StandardCharsets;
 
 public class JwtAuthWebFilter implements WebFilter {
 
@@ -39,19 +34,21 @@ public class JwtAuthWebFilter implements WebFilter {
     //想办法怎么从spring security里拿出来
     private ServerSecurityContextRepository securityContextRepository;
 
+    private ServerAuthenticationSuccessHandler authenticationSuccessHandler;
+
+    private ServerAuthenticationFailureHandler authenticationFailureHandler;
+
 
     private String usernameParameter = "username";
 
     private String passwordParameter = "password";
 
-    private Gson gson;
-
-    private KVPlusMap<String, SecurityContext> cache = new KVPlusMap<>();
-
     public JwtAuthWebFilter(ReactiveAuthenticationManager authenticationManager, ServerSecurityContextRepository serverSecurityContextRepository, Gson gson) {
-        this.gson = gson;
         this.authenticationManagerResolver = request -> Mono.just(authenticationManager);
         this.securityContextRepository = serverSecurityContextRepository;
+
+        this.authenticationSuccessHandler = new AuthenticationSuccessHandler(gson);
+        this.authenticationFailureHandler = new AuthenticationFailureHandler(gson);
     }
 
     /**
@@ -82,7 +79,8 @@ public class JwtAuthWebFilter implements WebFilter {
                 .flatMap(authenticationManager -> authenticationManager.authenticate(token))
                 .switchIfEmpty(Mono.defer(() -> Mono.error(new IllegalStateException("No provider found for " + token.getClass()))))
                 .flatMap(authentication -> onAuthenticationSuccess(authentication, webFilterExchange))
-                .onErrorResume(AuthenticationException.class, e -> onAuthenticationFailure(webFilterExchange, e));
+                .onErrorResume(AuthenticationException.class, e -> this.authenticationFailureHandler
+                        .onAuthenticationFailure(webFilterExchange, e));
     }
 
     private Mono<Void> onAuthenticationSuccess(Authentication authentication, WebFilterExchange webFilterExchange) {
@@ -90,51 +88,12 @@ public class JwtAuthWebFilter implements WebFilter {
         SecurityContextImpl securityContext = new SecurityContextImpl();
         securityContext.setAuthentication(authentication);
 
-        this.securityContextRepository.save(exchange, securityContext)
+        return this.securityContextRepository.save(exchange, securityContext)
+                .then(this.authenticationSuccessHandler
+                        .onAuthenticationSuccess(webFilterExchange, authentication))
                 .subscriberContext(ReactiveSecurityContextHolder.withSecurityContext(Mono.just(securityContext)));
-
-
-        ServerHttpResponse response = webFilterExchange.getExchange().getResponse();
-        response.setStatusCode(HttpStatus.OK);
-        response.getHeaders().add("Content-Type", "application/json");
-        response.getHeaders().add("X-AUTH-TOKEN", exchange.getAttribute("token"));
-
-        DataResponse dataResponse = new DataResponse()
-                .success();
-
-        String resp = gson.toJson(dataResponse);
-
-        DataBuffer buffer = response.bufferFactory().wrap(resp.getBytes(StandardCharsets.UTF_8));
-
-        return response.writeWith(Mono.just(buffer));
     }
 
-    private Mono<Void> onAuthenticationFailure(WebFilterExchange webFilterExchange,
-                                              AuthenticationException exception) {
-        ServerHttpResponse response = webFilterExchange.getExchange().getResponse();
-        response.setStatusCode(HttpStatus.OK);
-        response.getHeaders()
-                .add("Content-Type", "application/json");
-
-        DataResponse dataResponse;
-        if (exception instanceof BadCredentialsException){
-            dataResponse = new DataResponse()
-                    .failed()
-                    .msg("用户名或密码错误.");
-        }else {
-            dataResponse = new DataResponse()
-                    .failed()
-                    .msg("登陆失败 请稍后再试.");
-        }
-
-
-        String resp = gson.toJson(dataResponse);
-
-        DataBuffer buffer = response.bufferFactory().wrap(resp.getBytes(StandardCharsets.UTF_8));
-
-        return response.writeWith(Mono.just(buffer));
-
-    }
 
 
     private Mono<Authentication> convert(ServerWebExchange exchange) {

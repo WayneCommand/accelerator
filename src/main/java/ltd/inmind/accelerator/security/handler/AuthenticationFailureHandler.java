@@ -3,7 +3,6 @@ package ltd.inmind.accelerator.security.handler;
 import com.google.gson.Gson;
 import lombok.AllArgsConstructor;
 import ltd.inmind.accelerator.model.vo.DataResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpResponse;
@@ -22,7 +21,6 @@ public class AuthenticationFailureHandler implements ServerAuthenticationFailure
 
     @Override
     public Mono<Void> onAuthenticationFailure(WebFilterExchange webFilterExchange, AuthenticationException e) {
-
         ServerHttpResponse response = webFilterExchange.getExchange().getResponse();
         response.setStatusCode(HttpStatus.OK);
         response.getHeaders()

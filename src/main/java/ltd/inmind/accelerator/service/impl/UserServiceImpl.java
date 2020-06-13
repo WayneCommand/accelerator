@@ -7,6 +7,7 @@ import ltd.inmind.accelerator.model.vo.MyHomePage;
 import ltd.inmind.accelerator.model.vo.MyInfo;
 import ltd.inmind.accelerator.model.vo.MySafety;
 import ltd.inmind.accelerator.model.vo.VerifyCode;
+import ltd.inmind.accelerator.service.IJwtTokenSecurityContext;
 import ltd.inmind.accelerator.service.IUserAccountService;
 import ltd.inmind.accelerator.service.IUserProfileService;
 import ltd.inmind.accelerator.service.IUserService;
@@ -14,6 +15,7 @@ import ltd.inmind.accelerator.utils.KVPlusMap;
 import ltd.inmind.accelerator.utils.RandomUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +33,12 @@ public class UserServiceImpl implements IUserService {
 
     @Autowired
     private IUserProfileService userProfileService;
+
+    @Autowired
+    private IJwtTokenSecurityContext jwtTokenSecurityContext;
+
+    @Autowired
+    private ReactiveUserDetailsService reactiveUserDetailsService;
 
     private KVPlusMap<String, String> verifyCache = new KVPlusMap<>();
 
@@ -197,4 +205,10 @@ public class UserServiceImpl implements IUserService {
 
         userAccountService.updateUserAccount(userAccount);
     }
+
+    @Override
+    public String refreshToken(String username) {
+        return jwtTokenSecurityContext.create(reactiveUserDetailsService.findByUsername(username));
+    }
+
 }

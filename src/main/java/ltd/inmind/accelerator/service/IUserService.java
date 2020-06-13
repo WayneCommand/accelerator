@@ -52,4 +52,7 @@ public interface IUserService {
     Boolean testVerifyCode(VerifyCode verifyCode, String account, String businessLine);
 
     void updateUserAccount(UserAccount userAccount);
+
+    //FIXME 不允许block
+    String refreshToken(String username);
 }

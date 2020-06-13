@@ -5,14 +5,15 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Date;
 
+@Slf4j
 public class JwtUtil {
-    private static final long EXPIRE_TIME = 5 * 60 * 1000;
+    private static final long EXPIRE_TIME = 10 * 60 * 1000;
 
     public static final String JWT_USERNAME = "username";
-
 
 
     /**
@@ -33,6 +34,7 @@ public class JwtUtil {
             DecodedJWT jwt = verifier.verify(token);
             return true;
         } catch (Exception exception) {
+            log.error("jwt verify failed", exception);
             return false;
         }
     }

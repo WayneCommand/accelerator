@@ -2,11 +2,12 @@ package ltd.inmind.accelerator.config;
 
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
-import ltd.inmind.accelerator.authentication.JwtAuthWebFilter;
-import ltd.inmind.accelerator.authentication.JwtTokenServerSecurityContextRepository;
+import ltd.inmind.accelerator.security.filter.JwtAuthWebFilter;
+import ltd.inmind.accelerator.security.repository.JwtTokenServerSecurityContextRepository;
 import ltd.inmind.accelerator.security.service.AcceleratorReactiveUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UserDetailsRepositoryReactiveAuthenticationManager;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
@@ -64,9 +65,14 @@ public class SecurityConfig {
     }
 
     private JwtAuthWebFilter jwtAuthWebFilter() {
-        UserDetailsRepositoryReactiveAuthenticationManager reactiveAuthenticationManager = new UserDetailsRepositoryReactiveAuthenticationManager(reactiveUserDetailsService());
 
-        return new JwtAuthWebFilter(reactiveAuthenticationManager, securityContextRepository(), gson);
+        return new JwtAuthWebFilter(reactiveAuthenticationManager(), securityContextRepository(), gson);
+    }
+
+    @Bean
+    public ReactiveAuthenticationManager reactiveAuthenticationManager(){
+
+        return new UserDetailsRepositoryReactiveAuthenticationManager(reactiveUserDetailsService());
     }
 
 }

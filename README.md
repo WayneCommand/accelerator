@@ -8,14 +8,13 @@
   
   - web flux (Netty作为容器)
   - spring security （权限框架）
-  - spring session (用于管理session 非常方便拓展为无状态服务)
+  - JWT（Java Web Token）
   - mybatis-plus (简化开发的神器)
   - HikariCP(数据库连接池)
   - Oauth2 (oauth2授权服务 还在完善中)
   
 ### 以后的feature
   - 集群架构
-  - JWT（Java Web Token）
   
 ### WebUI
 参见：https://github.com/shenlanAZ/accelerator_ui

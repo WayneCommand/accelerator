@@ -58,7 +58,8 @@ public class UserTests {
     @Test
     public void testJwtToken() {
 
-        System.out.println(jwtTokenSecurityContext.create(Mono.empty()));
+        jwtTokenSecurityContext.create(Mono.empty())
+                .subscribe(System.out::println);
 
     }
 

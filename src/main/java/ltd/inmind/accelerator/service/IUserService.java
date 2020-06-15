@@ -6,6 +6,7 @@ import ltd.inmind.accelerator.model.vo.MyHomePage;
 import ltd.inmind.accelerator.model.vo.MyInfo;
 import ltd.inmind.accelerator.model.vo.MySafety;
 import ltd.inmind.accelerator.model.vo.VerifyCode;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -53,6 +54,5 @@ public interface IUserService {
 
     void updateUserAccount(UserAccount userAccount);
 
-    //FIXME 不允许block
-    String refreshToken(String username);
+    Mono<String> refreshToken(String username);
 }

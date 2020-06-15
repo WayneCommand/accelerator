@@ -61,11 +61,10 @@ public class JwtTokenSecurityContext implements IJwtTokenSecurityContext {
     }
 
     @Override
-    public String create(Mono<UserDetails> userDetailsMono) {
+    public Mono<String> create(Mono<UserDetails> userDetailsMono) {
         return createAuthentication(userDetailsMono)
                 .map(SecurityContextImpl::new)
-                .map(this::save)
-                .block();
+                .map(this::save);
     }
 
     private String getUsername(String token) {

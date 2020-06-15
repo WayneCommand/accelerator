@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 import java.util.List;
@@ -207,7 +208,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public String refreshToken(String username) {
+    public Mono<String> refreshToken(String username) {
         return jwtTokenSecurityContext.create(reactiveUserDetailsService.findByUsername(username));
     }
 

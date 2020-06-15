@@ -30,6 +30,6 @@ public interface IJwtTokenSecurityContext {
      * 用userDetail 创建token 并保存SecurityContext
      * @return token
      */
-    String create(Mono<UserDetails> userDetailsMono);
+    Mono<String> create(Mono<UserDetails> userDetailsMono);
 
 }

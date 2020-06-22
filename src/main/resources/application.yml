@@ -13,7 +13,7 @@ spring:
     password: password
     type: com.zaxxer.hikari.HikariDataSource
 
-  http:
+  mvc:
     converters:
       preferred-json-mapper: gson
 

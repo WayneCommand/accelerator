@@ -1,4 +1,4 @@
-# JWT配合shiro做身份验证
+# JWT配合 spring security 做身份验证
 
 ## JWT (Json Web Token)
 

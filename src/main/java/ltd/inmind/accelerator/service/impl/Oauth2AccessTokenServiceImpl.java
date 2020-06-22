@@ -1,7 +1,7 @@
 package ltd.inmind.accelerator.service.impl;
 
 import ltd.inmind.accelerator.mapper.Oauth2AccessTokenMapper;
-import ltd.inmind.accelerator.model.Oauth2AccessToken;
+import ltd.inmind.accelerator.model.oauth2.Oauth2AccessToken;
 import ltd.inmind.accelerator.model.po.UserAccount;
 import ltd.inmind.accelerator.service.IUserAccountService;
 import ltd.inmind.accelerator.service.Oauth2AccessTokenService;

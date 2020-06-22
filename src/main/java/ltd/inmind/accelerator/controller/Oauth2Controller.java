@@ -1,6 +1,6 @@
 package ltd.inmind.accelerator.controller;
 
-import ltd.inmind.accelerator.model.AccessTokenResult;
+import ltd.inmind.accelerator.model.oauth2.AccessTokenResult;
 import ltd.inmind.accelerator.service.Oauth2ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -61,7 +61,6 @@ public class Oauth2Controller {
 
             AccessTokenResult accessTokenResult = new AccessTokenResult();
             accessTokenResult.setAccess_token(accessToken);
-            accessTokenResult.setTokenType(AccessTokenResult.TOKEN_TYPE.BEARER);
 
             //成功之后返回token
             return accessTokenResult;

@@ -1,6 +1,5 @@
 package ltd.inmind.accelerator.security.service;
 
-import ltd.inmind.accelerator.model.po.UserAccount;
 import ltd.inmind.accelerator.service.IUserAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
@@ -17,11 +16,10 @@ public class AcceleratorReactiveUserDetailsService implements ReactiveUserDetail
     @Override
     public Mono<UserDetails> findByUsername(String username) {
 
-        UserAccount byAccount = userAccountService.getByAccount(username);
-
-        if (byAccount == null)
-            return Mono.empty();
-
-        return Mono.just(new org.springframework.security.core.userdetails.User(byAccount.getAccount(), byAccount.getPassword(), Collections.emptyList()));
+        return Mono.justOrEmpty(userAccountService.getByAccount(username))
+                .map(byAccount ->
+                        new org.springframework.security.core.userdetails.User(byAccount.getAccount(),
+                                byAccount.getPassword(),
+                                Collections.emptyList()));
     }
 }

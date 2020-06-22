@@ -2,8 +2,7 @@ package ltd.inmind.accelerator;
 
 import ltd.inmind.accelerator.mapper.Oauth2ClientMapper;
 import ltd.inmind.accelerator.mapper.UserAccountMapper;
-import ltd.inmind.accelerator.model.Oauth2Client;
-import ltd.inmind.accelerator.model.po.UserAccount;
+import ltd.inmind.accelerator.model.oauth2.Oauth2Client;
 import ltd.inmind.accelerator.service.IJwtTokenSecurityContext;
 import ltd.inmind.accelerator.service.IUserAccountService;
 import ltd.inmind.accelerator.service.IUserService;

@@ -1,6 +1,6 @@
 package ltd.inmind.accelerator.service;
 
-import ltd.inmind.accelerator.model.Oauth2Client;
+import ltd.inmind.accelerator.model.oauth2.Oauth2Client;
 
 public interface Oauth2ClientService {
 

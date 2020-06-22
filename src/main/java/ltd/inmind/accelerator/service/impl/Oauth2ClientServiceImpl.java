@@ -3,7 +3,7 @@ package ltd.inmind.accelerator.service.impl;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import ltd.inmind.accelerator.constants.Oauth2Const;
 import ltd.inmind.accelerator.mapper.Oauth2ClientMapper;
-import ltd.inmind.accelerator.model.Oauth2Client;
+import ltd.inmind.accelerator.model.oauth2.Oauth2Client;
 import ltd.inmind.accelerator.service.Oauth2AccessTokenService;
 import ltd.inmind.accelerator.service.Oauth2ClientService;
 import ltd.inmind.accelerator.utils.UUIDUtil;

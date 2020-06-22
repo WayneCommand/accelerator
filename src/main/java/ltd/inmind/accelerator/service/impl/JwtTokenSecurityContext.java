@@ -43,6 +43,9 @@ public class JwtTokenSecurityContext implements IJwtTokenSecurityContext {
     @Override
     public SecurityContext load(String token) {
 
+        if (!tokenSecrets.containsKey(token))
+            return null;
+
         //先进行校验
         boolean verify = JwtUtil.verify(token, getUsername(token), tokenSecrets.get(token));
 

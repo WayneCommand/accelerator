@@ -30,7 +30,7 @@ CREATE TABLE `u_user_account`  (
   `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '密码',
   `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '邮箱',
   `recovery_email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '辅助邮箱',
-  `phone` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '手机',
+  `recovery_phone` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '手机',
   `phone_to_login` int(1) NOT NULL COMMENT '手机登录标识',
   `two_step_verify` int(1) NOT NULL COMMENT '二步验证',
   `password_modify_time` datetime(0) NULL DEFAULT NULL COMMENT '上次密码修改时间',
@@ -38,12 +38,8 @@ CREATE TABLE `u_user_account`  (
   `create_time` datetime(0) NOT NULL,
   `modify_time` datetime(0) NULL DEFAULT NULL,
   PRIMARY KEY (`u_id`) USING BTREE
-) AUTO_INCREMENT = 3
+);
 
--- ----------------------------
--- Records of u_user_account
--- ----------------------------
-INSERT INTO `u_user_account` VALUES (2, 'shenlan', '{bcrypt}$2a$10$Fxzx2fhvSufRsTGksBeCvu5Y59LZECpDzvf/30YW0zOWx0w3nMkCy', NULL, NULL, NULL, 0, 0, NULL, NULL, '2020-05-12 10:18:11', NULL);
 
 -- ----------------------------
 -- Table structure for u_user_profile
@@ -53,15 +49,12 @@ CREATE TABLE `u_user_profile`  (
   `u_id` int(11) NOT NULL COMMENT '用户唯一ID',
   `nickname` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '用户昵称',
   `avatar` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '头像',
+  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '邮箱',
+  `phone` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '电话',
   `theme` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '主题',
   `create_time` datetime(0) NOT NULL,
   `modify_time` datetime(0) NULL DEFAULT NULL,
   PRIMARY KEY (`u_id`) USING BTREE
-)
-
--- ----------------------------
--- Records of u_user_profile
--- ----------------------------
-INSERT INTO `u_user_profile` VALUES (2, NULL, NULL, NULL, '2020-05-12 10:18:11', NULL);
+);
 
 SET FOREIGN_KEY_CHECKS = 1;

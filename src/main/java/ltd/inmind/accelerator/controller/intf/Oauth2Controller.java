@@ -1,4 +1,4 @@
-package ltd.inmind.accelerator.controller;
+package ltd.inmind.accelerator.controller.intf;
 
 import ltd.inmind.accelerator.model.oauth2.AccessTokenResult;
 import ltd.inmind.accelerator.service.Oauth2ClientService;

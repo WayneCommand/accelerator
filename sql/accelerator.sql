@@ -7,7 +7,7 @@ SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS `u_device_token`;
 CREATE TABLE `u_device_token`  (
   `u_id` int(11) NOT NULL,
-  `token` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '令牌',
+  `token` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '令牌',
   `device` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '设备',
   `device_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '设备名',
   `ip` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT 'IP',
@@ -16,10 +16,8 @@ CREATE TABLE `u_device_token`  (
   `last_time` datetime(0) NULL DEFAULT NULL COMMENT '最后一次出现的时间',
   `active_count` int(11) NULL DEFAULT NULL COMMENT '活跃计数',
   `create_time` datetime(0) NOT NULL,
-  `modify_time` datetime(0) NULL DEFAULT NULL,
-  PRIMARY KEY (`u_id`) USING BTREE
-)
-
+  `modify_time` datetime(0) NULL DEFAULT NULL
+);
 -- ----------------------------
 -- Table structure for u_user_account
 -- ----------------------------

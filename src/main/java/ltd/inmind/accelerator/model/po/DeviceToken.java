@@ -34,7 +34,5 @@ public class DeviceToken {
   @TableField(fill = FieldFill.INSERT)
   private Date createTime;
 
-  @TableField(fill = FieldFill.UPDATE)
   private Date modifyTime;
-
 }

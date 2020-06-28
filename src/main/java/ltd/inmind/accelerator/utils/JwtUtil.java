@@ -54,7 +54,7 @@ public class JwtUtil {
     }
 
     /**
-     * 生成签名,5min后过期
+     * 生成token
      *
      * @param username 用户名
      * @param secret   用户的密码

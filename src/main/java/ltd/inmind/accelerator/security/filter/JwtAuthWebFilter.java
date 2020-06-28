@@ -3,6 +3,7 @@ package ltd.inmind.accelerator.security.filter;
 import com.google.gson.Gson;
 import ltd.inmind.accelerator.security.handler.AuthenticationFailureHandler;
 import ltd.inmind.accelerator.security.handler.AuthenticationSuccessHandler;
+import ltd.inmind.accelerator.service.IDeviceTokenService;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
@@ -43,11 +44,12 @@ public class JwtAuthWebFilter implements WebFilter {
 
     private String passwordParameter = "password";
 
-    public JwtAuthWebFilter(ReactiveAuthenticationManager authenticationManager, ServerSecurityContextRepository serverSecurityContextRepository, Gson gson) {
+    public JwtAuthWebFilter(ReactiveAuthenticationManager authenticationManager, ServerSecurityContextRepository serverSecurityContextRepository, Gson gson, IDeviceTokenService deviceTokenService) {
+
         this.authenticationManagerResolver = request -> Mono.just(authenticationManager);
         this.securityContextRepository = serverSecurityContextRepository;
 
-        this.authenticationSuccessHandler = new AuthenticationSuccessHandler(gson);
+        this.authenticationSuccessHandler = new AuthenticationSuccessHandler(gson, deviceTokenService);
         this.authenticationFailureHandler = new AuthenticationFailureHandler(gson);
     }
 

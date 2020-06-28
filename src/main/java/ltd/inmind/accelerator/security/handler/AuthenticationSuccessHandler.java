@@ -2,7 +2,10 @@ package ltd.inmind.accelerator.security.handler;
 
 import com.google.gson.Gson;
 import lombok.AllArgsConstructor;
+import ltd.inmind.accelerator.model.po.DeviceToken;
 import ltd.inmind.accelerator.model.vo.DataResponse;
+import ltd.inmind.accelerator.service.IDeviceTokenService;
+import ltd.inmind.accelerator.utils.IPUtil;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpResponse;
@@ -22,12 +25,18 @@ public class AuthenticationSuccessHandler implements ServerAuthenticationSuccess
 
     private Gson gson;
 
+    private IDeviceTokenService deviceTokenService;
+
     @Override
     public Mono<Void> onAuthenticationSuccess(WebFilterExchange webFilterExchange, Authentication authentication) {
         ServerHttpResponse response = webFilterExchange.getExchange().getResponse();
         response.setStatusCode(HttpStatus.OK);
         response.getHeaders().add("Content-Type", "application/json");
         response.getHeaders().add(AUTHENTICATION_HEADER, webFilterExchange.getExchange().getAttribute(TOKEN_ATTR_NAME));
+
+        saveDeviceToken(webFilterExchange.getExchange().getAttribute(TOKEN_ATTR_NAME),
+                IPUtil.getIp(webFilterExchange.getExchange().getRequest()),
+                1L);
 
         DataResponse dataResponse = new DataResponse()
                 .success();
@@ -37,5 +46,16 @@ public class AuthenticationSuccessHandler implements ServerAuthenticationSuccess
         DataBuffer buffer = response.bufferFactory().wrap(resp.getBytes(StandardCharsets.UTF_8));
 
         return response.writeWith(Mono.just(buffer));
+    }
+
+    private void saveDeviceToken(String token, String ip, Long uId) {
+        DeviceToken deviceToken = new DeviceToken();
+
+        deviceToken.setToken(token);
+        deviceToken.setIp(ip);
+        deviceToken.setUId(uId);
+        deviceToken.setActiveCount(0);
+
+        deviceTokenService.saveDeviceToken(deviceToken);
     }
 }

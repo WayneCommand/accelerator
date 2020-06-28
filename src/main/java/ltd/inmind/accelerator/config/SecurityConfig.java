@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import ltd.inmind.accelerator.security.filter.JwtAuthWebFilter;
 import ltd.inmind.accelerator.security.repository.JwtTokenServerSecurityContextRepository;
 import ltd.inmind.accelerator.security.service.AcceleratorReactiveUserDetailsService;
+import ltd.inmind.accelerator.service.IDeviceTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
@@ -24,6 +25,9 @@ public class SecurityConfig {
 
     @Autowired
     private Gson gson;
+
+    @Autowired
+    private IDeviceTokenService deviceTokenService;
 
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
@@ -66,7 +70,7 @@ public class SecurityConfig {
 
     private JwtAuthWebFilter jwtAuthWebFilter() {
 
-        return new JwtAuthWebFilter(reactiveAuthenticationManager(), securityContextRepository(), gson);
+        return new JwtAuthWebFilter(reactiveAuthenticationManager(), securityContextRepository(), gson, deviceTokenService);
     }
 
     @Bean

@@ -5,13 +5,14 @@ import lombok.AllArgsConstructor;
 import ltd.inmind.accelerator.model.po.DeviceToken;
 import ltd.inmind.accelerator.model.vo.DataResponse;
 import ltd.inmind.accelerator.service.IDeviceTokenService;
-import ltd.inmind.accelerator.utils.IPUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.server.WebFilterExchange;
 import org.springframework.security.web.server.authentication.ServerAuthenticationSuccessHandler;
+import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import java.nio.charset.StandardCharsets;
@@ -21,10 +22,13 @@ import static ltd.inmind.accelerator.constants.SecurityConst.TOKEN_ATTR_NAME;
 
 
 @AllArgsConstructor
+@Component
 public class AuthenticationSuccessHandler implements ServerAuthenticationSuccessHandler {
 
+    @Autowired
     private Gson gson;
 
+    @Autowired
     private IDeviceTokenService deviceTokenService;
 
     @Override
@@ -35,7 +39,8 @@ public class AuthenticationSuccessHandler implements ServerAuthenticationSuccess
         response.getHeaders().add(AUTHENTICATION_HEADER, webFilterExchange.getExchange().getAttribute(TOKEN_ATTR_NAME));
 
         saveDeviceToken(webFilterExchange.getExchange().getAttribute(TOKEN_ATTR_NAME),
-                IPUtil.getIp(webFilterExchange.getExchange().getRequest()),
+                webFilterExchange.getExchange().getRequest()
+                        .getRemoteAddress().getAddress().getHostAddress(),
                 1L);
 
         DataResponse dataResponse = new DataResponse()

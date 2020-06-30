@@ -3,6 +3,7 @@ package ltd.inmind.accelerator.security.handler;
 import com.google.gson.Gson;
 import lombok.AllArgsConstructor;
 import ltd.inmind.accelerator.model.vo.DataResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpResponse;
@@ -10,13 +11,16 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.server.WebFilterExchange;
 import org.springframework.security.web.server.authentication.ServerAuthenticationFailureHandler;
+import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import java.nio.charset.StandardCharsets;
 
 @AllArgsConstructor
+@Component
 public class AuthenticationFailureHandler implements ServerAuthenticationFailureHandler {
 
+    @Autowired
     private Gson gson;
 
     @Override

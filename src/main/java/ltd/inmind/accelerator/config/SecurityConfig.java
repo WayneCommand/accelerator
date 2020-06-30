@@ -1,11 +1,9 @@
 package ltd.inmind.accelerator.config;
 
-import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import ltd.inmind.accelerator.security.filter.JwtAuthWebFilter;
 import ltd.inmind.accelerator.security.repository.JwtTokenServerSecurityContextRepository;
 import ltd.inmind.accelerator.security.service.AcceleratorReactiveUserDetailsService;
-import ltd.inmind.accelerator.service.IDeviceTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
@@ -17,6 +15,8 @@ import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.web.server.authentication.ServerAuthenticationFailureHandler;
+import org.springframework.security.web.server.authentication.ServerAuthenticationSuccessHandler;
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
 
 @EnableWebFluxSecurity
@@ -24,10 +24,10 @@ import org.springframework.security.web.server.context.ServerSecurityContextRepo
 public class SecurityConfig {
 
     @Autowired
-    private Gson gson;
+    private ServerAuthenticationSuccessHandler authenticationSuccessHandler;
 
     @Autowired
-    private IDeviceTokenService deviceTokenService;
+    private ServerAuthenticationFailureHandler authenticationFailureHandler;
 
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
@@ -70,7 +70,8 @@ public class SecurityConfig {
 
     private JwtAuthWebFilter jwtAuthWebFilter() {
 
-        return new JwtAuthWebFilter(reactiveAuthenticationManager(), securityContextRepository(), gson, deviceTokenService);
+        return new JwtAuthWebFilter(reactiveAuthenticationManager(), securityContextRepository(),
+                authenticationSuccessHandler, authenticationFailureHandler);
     }
 
     @Bean

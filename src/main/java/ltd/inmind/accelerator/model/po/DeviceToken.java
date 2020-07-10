@@ -17,7 +17,9 @@ public class DeviceToken {
 
   private String token;
 
-  private String device;
+  private String deviceId;
+
+  private String deviceType;
 
   private String deviceName;
 

@@ -1,16 +1,14 @@
 package ltd.inmind.accelerator.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import ltd.inmind.accelerator.model.po.DeviceToken;
 import ltd.inmind.accelerator.model.po.UserAccount;
 import ltd.inmind.accelerator.model.po.UserProfile;
 import ltd.inmind.accelerator.model.vo.MyHomePage;
 import ltd.inmind.accelerator.model.vo.MyInfo;
 import ltd.inmind.accelerator.model.vo.MySafety;
 import ltd.inmind.accelerator.model.vo.VerifyCode;
-import ltd.inmind.accelerator.service.IJwtTokenSecurityContext;
-import ltd.inmind.accelerator.service.IUserAccountService;
-import ltd.inmind.accelerator.service.IUserProfileService;
-import ltd.inmind.accelerator.service.IUserService;
+import ltd.inmind.accelerator.service.*;
 import ltd.inmind.accelerator.utils.KVPlusMap;
 import ltd.inmind.accelerator.utils.RandomUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -34,6 +32,9 @@ public class UserServiceImpl implements IUserService {
 
     @Autowired
     private IUserProfileService userProfileService;
+
+    @Autowired
+    private IDeviceTokenService deviceTokenService;
 
     @Autowired
     private IJwtTokenSecurityContext jwtTokenSecurityContext;
@@ -111,8 +112,9 @@ public class UserServiceImpl implements IUserService {
         userAccount.setCreateTime(null);
         userAccount.setModifyTime(null);
 
+        List<DeviceToken> deviceTokens = deviceTokenService.getDeviceTokensByUId(userAccount.getUId());
         mySafety.setUserAccount(userAccount);
-        mySafety.setDeviceTokenList(Collections.emptyList());
+        mySafety.setDeviceTokenList(deviceTokens);
 
         return mySafety;
     }

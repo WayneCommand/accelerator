@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class DeviceTokenServiceImpl implements IDeviceTokenService {
@@ -17,6 +18,13 @@ public class DeviceTokenServiceImpl implements IDeviceTokenService {
 
     @Override
     public void saveDeviceToken(DeviceToken device) {
+        DeviceToken _deviceToken = loadDeviceTokenByDeviceId(device.getDeviceId());
+        if (_deviceToken != null){
+            //如果相同的deviceId 直接更新token即可
+            updateTokenByDeviceId(device.getDeviceId(), device.getToken());
+            return;
+        }
+
         Date now = new Date();
 
         device.setFirstTime(now);
@@ -36,10 +44,25 @@ public class DeviceTokenServiceImpl implements IDeviceTokenService {
                 .eq(DeviceToken::getToken, origin));
     }
 
+    private void updateTokenByDeviceId(String deviceId, String token) {
+        DeviceToken deviceToken = new DeviceToken();
+        deviceToken.setToken(token);
+
+        deviceToken.setModifyTime(new Date());
+
+        deviceTokenMapper.update(deviceToken, Wrappers.<DeviceToken>lambdaQuery()
+                .eq(DeviceToken::getDeviceId, deviceId));
+    }
+
     @Override
     public DeviceToken loadDeviceToken(String token) {
         return deviceTokenMapper.selectOne(Wrappers.<DeviceToken>lambdaQuery()
                 .eq(DeviceToken::getToken, token));
+    }
+
+    private DeviceToken loadDeviceTokenByDeviceId(String deviceId) {
+        return deviceTokenMapper.selectOne(Wrappers.<DeviceToken>lambdaQuery()
+                .eq(DeviceToken::getDeviceId, deviceId));
     }
 
     @Override
@@ -58,4 +81,11 @@ public class DeviceTokenServiceImpl implements IDeviceTokenService {
         deviceTokenMapper.update(deviceToken, Wrappers.<DeviceToken>lambdaQuery()
                 .eq(DeviceToken::getToken, token));
     }
+
+    @Override
+    public List<DeviceToken> getDeviceTokensByUId(Long uId) {
+        return deviceTokenMapper.selectList(Wrappers.<DeviceToken>lambdaQuery()
+                .eq(DeviceToken::getUId, uId));
+    }
+
 }

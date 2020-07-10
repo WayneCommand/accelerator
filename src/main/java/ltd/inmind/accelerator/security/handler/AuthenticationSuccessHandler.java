@@ -65,22 +65,25 @@ public class AuthenticationSuccessHandler implements ServerAuthenticationSuccess
 
     private Mono<DeviceToken> getAccessInfo(MultiValueMap<String,String> form){
         String ip = form.getFirst("ip");
-        String browserName = form.getFirst("browserName");
-        String browserType = form.getFirst("browserType");
-        String browserVersion = form.getFirst("browserVersion");
-        String locationCountry = form.getFirst("locationCountry");
-        String locationCity = form.getFirst("locationCity");
+        String deviceId = form.getFirst("deviceId"); //primary id (RV)
+        String deviceName = form.getFirst("deviceName"); //edge-chromium,firefox,windows,mac
+        String deviceType = form.getFirst("deviceType"); //browser,app
+        String deviceVersion = form.getFirst("deviceVersion");//browser ver / system ver
+        String deviceSystem = form.getFirst("deviceSystem");//windows,android
+        String locationCountry = form.getFirst("locationCountry");//CN,US
+        String locationCity = form.getFirst("locationCity");//SH,BJ
 
         DeviceToken deviceToken = new DeviceToken();
         deviceToken.setIp(ip);
+        deviceToken.setDeviceId(deviceId);
 
-        if (!StringUtils.isAnyBlank(browserName, browserVersion)) {
-            deviceToken.setDeviceName(String.format("%s(%s)", browserName, browserVersion));
+        if (!StringUtils.isAnyBlank(deviceName, deviceVersion,deviceSystem)) {
+            deviceToken.setDeviceName(String.format("%s %s(%s)", deviceSystem, deviceName, deviceVersion));
         } else {
-            deviceToken.setDeviceName(browserName);
+            deviceToken.setDeviceName(deviceName);
         }
 
-        deviceToken.setDevice(browserType);
+        deviceToken.setDeviceType(deviceName);
 
         if (!StringUtils.isAnyBlank(locationCity, locationCountry)){
             String location = String.format("%s-%s", locationCountry, locationCity);

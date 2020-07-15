@@ -21,11 +21,23 @@ public class DeviceToken {
 
   private String deviceType;
 
+  private String deviceModel;
+
   private String deviceName;
+
+  private String deviceVersion;
+
+  private String deviceSystem;
 
   private String ip;
 
   private String location;
+
+  private String locationCountry;
+
+  private String locationRegion;
+
+  private String locationCity;
 
   private Date firstTime;
 

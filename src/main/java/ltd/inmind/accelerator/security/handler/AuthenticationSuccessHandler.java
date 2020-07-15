@@ -64,34 +64,50 @@ public class AuthenticationSuccessHandler implements ServerAuthenticationSuccess
     }
 
     private Mono<DeviceToken> getAccessInfo(MultiValueMap<String,String> form){
-        String ip = form.getFirst("ip");
+        String ip = form.getFirst("ip"); //ipv4
         String deviceId = form.getFirst("deviceId"); //primary id (RV)
-        String deviceName = form.getFirst("deviceName"); //edge-chromium,firefox,windows,mac
+        String deviceModel = form.getFirst("deviceModel"); //edge-chromium,firefox,windows,mac
         String deviceType = form.getFirst("deviceType"); //browser,app
         String deviceVersion = form.getFirst("deviceVersion");//browser ver / system ver
         String deviceSystem = form.getFirst("deviceSystem");//windows,android
-        String locationCountry = form.getFirst("locationCountry");//CN,US
-        String locationCity = form.getFirst("locationCity");//SH,BJ
+        String locationCountry = form.getFirst("locationCountry");//China, United States
+        String locationRegion = form.getFirst("locationRegion");//Shanghai, Virginia
+        String locationCity = form.getFirst("locationCity");//Shanghai, Ashburn
 
         DeviceToken deviceToken = new DeviceToken();
         deviceToken.setIp(ip);
         deviceToken.setDeviceId(deviceId);
 
-        if (!StringUtils.isAnyBlank(deviceName, deviceVersion,deviceSystem)) {
-            deviceToken.setDeviceName(String.format("%s %s(%s)", deviceSystem, deviceName, deviceVersion));
+        //预设的设备名
+        if (!StringUtils.isAnyBlank(deviceModel, deviceVersion,deviceSystem)) {
+            deviceToken.setDeviceName(String.format("%s %s(%s)", deviceSystem, deviceModel, deviceVersion));
         } else {
-            deviceToken.setDeviceName(deviceName);
+            deviceToken.setDeviceName(deviceModel);
         }
 
-        deviceToken.setDeviceType(deviceName);
+        deviceToken.setDeviceModel(deviceModel);
+        deviceToken.setDeviceType(deviceType);
+        deviceToken.setDeviceVersion(deviceVersion);
+        deviceToken.setDeviceSystem(deviceSystem);
 
-        if (!StringUtils.isAnyBlank(locationCity, locationCountry)){
-            String location = String.format("%s-%s", locationCountry, locationCity);
+        if (!StringUtils.isAnyBlank(locationCity, locationRegion, locationCountry)) {
+            String location = locationRegion.equals(locationCity) ?
+                    String.format("%s - %s", locationCountry, locationCity) :
+                    String.format("%s - %s - %s", locationCountry, locationRegion, locationCity);
             deviceToken.setLocation(location);
-        }else if (StringUtils.isNotBlank(locationCountry)){
+            deviceToken.setLocationCountry(locationCountry);
+            deviceToken.setLocationRegion(locationRegion);
+            deviceToken.setLocationCity(locationCity);
+        } else if (StringUtils.isNotBlank(locationCountry)) {
             deviceToken.setLocation(locationCountry);
-        }else {
+            deviceToken.setLocationCountry(locationCountry);
+            deviceToken.setLocationRegion("unknown");
+            deviceToken.setLocationCity("unknown");
+        } else {
             deviceToken.setLocation("unknown");
+            deviceToken.setLocationCountry("unknown");
+            deviceToken.setLocationRegion("unknown");
+            deviceToken.setLocationCity("unknown");
         }
 
         return Mono.just(deviceToken);

@@ -70,10 +70,10 @@ public class LoginController {
     @PostMapping("refreshToken")
     public Mono<ResponseEntity<DataResponse>> refreshToken(UserAccount user, Authentication authentication) {
         //比对传过来的username和当前已授权的username
-        if (authentication.getName().equals(user.getAccount())){
+        if ("accept".equals(user.getAccount())){
 
-            //生成refresh token
-            return userService.refreshToken(user.getAccount())
+            //生成 token
+            return userService.refreshToken(authentication.getName())
                     .map(refreshToken -> ResponseEntity.ok()
                             .header(SecurityConst.AUTHENTICATION_HEADER, refreshToken)
                             .body(new DataResponse().success()));

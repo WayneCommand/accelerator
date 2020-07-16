@@ -16,4 +16,8 @@ public interface IDeviceTokenService {
 
     List<DeviceToken> getDeviceTokensByUId(Long uId);
 
+    void deleteDevice(String deviceId);
+
+    void updateDeviceName(DeviceToken deviceToken);
+
 }

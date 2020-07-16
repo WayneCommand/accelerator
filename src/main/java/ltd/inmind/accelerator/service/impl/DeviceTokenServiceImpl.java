@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import ltd.inmind.accelerator.mapper.DeviceTokenMapper;
 import ltd.inmind.accelerator.model.po.DeviceToken;
 import ltd.inmind.accelerator.service.IDeviceTokenService;
+import ltd.inmind.accelerator.service.IJwtTokenSecurityContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,9 @@ public class DeviceTokenServiceImpl implements IDeviceTokenService {
 
     @Autowired
     private DeviceTokenMapper deviceTokenMapper;
+
+    @Autowired
+    private IJwtTokenSecurityContext jwtTokenSecurityContext;
 
     @Override
     public void saveDeviceToken(DeviceToken device) {
@@ -86,6 +90,33 @@ public class DeviceTokenServiceImpl implements IDeviceTokenService {
     public List<DeviceToken> getDeviceTokensByUId(Long uId) {
         return deviceTokenMapper.selectList(Wrappers.<DeviceToken>lambdaQuery()
                 .eq(DeviceToken::getUId, uId));
+    }
+
+    @Override
+    public void deleteDevice(String deviceId) {
+        DeviceToken _deviceToken = deviceTokenMapper.selectOne(Wrappers.<DeviceToken>lambdaQuery()
+                .eq(DeviceToken::getDeviceId, deviceId));
+
+        if (_deviceToken == null)
+            return;
+
+        //这里会真的删除记录 (隐私政策)
+        deviceTokenMapper.delete(Wrappers.<DeviceToken>lambdaQuery()
+                .eq(DeviceToken::getDeviceId, deviceId));
+
+        //一并把token也处理掉
+        String token = _deviceToken.getToken();
+        jwtTokenSecurityContext.remove(token);
+    }
+
+    @Override
+    public void updateDeviceName(DeviceToken deviceToken) {
+        DeviceToken _dt = new DeviceToken();
+        _dt.setDeviceName(deviceToken.getDeviceName());
+
+        deviceTokenMapper.update(_dt, Wrappers.<DeviceToken>lambdaQuery()
+                .eq(DeviceToken::getDeviceId, deviceToken.getDeviceId())
+                .eq(DeviceToken::getUId, deviceToken.getUId()));
     }
 
 }

@@ -42,7 +42,7 @@ public class SecurityConfig {
                 .addFilterAt(jwtAuthWebFilter(), SecurityWebFiltersOrder.FORM_LOGIN)
 
                 .authorizeExchange()
-                .pathMatchers("/login/lookup")
+                .pathMatchers("/login/lookup","/login/signUp")
                 .permitAll()
 
                 .and()

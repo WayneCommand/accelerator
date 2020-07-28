@@ -26,45 +26,40 @@ public class LoginController {
     /**
      * 注册接口
      *
-     * @param account 用户名
-     * @param password 密码
+     * @param account account password
      * @return
      */
     @PostMapping("/signUp")
-    public DataResponse signUp(String account, String password) {
+    public ResponseEntity<DataResponse> signUp(UserAccount account) {
 
         try {
+            userService.signUp(account.getAccount(), account.getPassword());
 
-            userService.signUp(account, password);
-
-            return new DataResponse()
-                    .success();
-
+            return ResponseEntity.ok(new DataResponse()
+                    .success());
         } catch (AcceleratorException e) {
 
             String msg = ExceptionConst.CODE_MSG.get(e.getCode());
 
-            return new DataResponse()
+            return ResponseEntity.badRequest()
+                    .body(new DataResponse()
                     .failed()
-                    .msg(msg);
+                    .msg(msg));
         }
     }
 
     @GetMapping("/lookup")
-    public DataResponse lookup(String username) {
+    public ResponseEntity<DataResponse> lookup(String username) {
         UserAccount userAccount = userService.getAccountByAccount(username);
 
         if (userAccount == null) {
-
-            return new DataResponse()
-                    .success()
-                    .data("isExist", "false")
-                    .msg("我们未找到您的账户, 请检查您的账户名。");
+            return ResponseEntity
+                    .notFound()
+                    .build();
         }
 
-        return new DataResponse()
-                .success()
-                .data("isExist", "true");
+        return ResponseEntity.ok(new DataResponse().success()
+                .data("isExist", "true"));
     }
 
     @PostMapping("refreshToken")

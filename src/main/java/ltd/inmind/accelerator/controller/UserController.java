@@ -1,5 +1,6 @@
 package ltd.inmind.accelerator.controller;
 
+import lombok.RequiredArgsConstructor;
 import ltd.inmind.accelerator.constants.BusinessLineConst;
 import ltd.inmind.accelerator.model.po.UserAccount;
 import ltd.inmind.accelerator.model.po.UserProfile;
@@ -8,19 +9,18 @@ import ltd.inmind.accelerator.model.vo.MyHomePage;
 import ltd.inmind.accelerator.model.vo.VerifyCode;
 import ltd.inmind.accelerator.service.IUserService;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/user")
 public class UserController {
 
-    @Autowired
-    private IUserService userService;
+    private final IUserService userService;
 
     @GetMapping("my_info")
     public DataResponse myInfo(Authentication authentication) {

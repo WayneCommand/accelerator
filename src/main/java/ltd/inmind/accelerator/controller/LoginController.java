@@ -1,12 +1,12 @@
 package ltd.inmind.accelerator.controller;
 
+import lombok.RequiredArgsConstructor;
 import ltd.inmind.accelerator.constants.ExceptionConst;
 import ltd.inmind.accelerator.constants.SecurityConst;
 import ltd.inmind.accelerator.exception.AcceleratorException;
 import ltd.inmind.accelerator.model.po.UserAccount;
 import ltd.inmind.accelerator.model.vo.DataResponse;
 import ltd.inmind.accelerator.service.IUserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,12 +16,12 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/login")
 public class LoginController {
 
-    @Autowired
-    private IUserService userService;
+    private final IUserService userService;
 
     /**
      * 注册接口

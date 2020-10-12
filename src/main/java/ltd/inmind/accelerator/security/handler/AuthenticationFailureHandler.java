@@ -1,9 +1,8 @@
 package ltd.inmind.accelerator.security.handler;
 
 import com.google.gson.Gson;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import ltd.inmind.accelerator.model.vo.DataResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpResponse;
@@ -16,12 +15,11 @@ import reactor.core.publisher.Mono;
 
 import java.nio.charset.StandardCharsets;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Component
 public class AuthenticationFailureHandler implements ServerAuthenticationFailureHandler {
 
-    @Autowired
-    private Gson gson;
+    private final Gson gson;
 
     @Override
     public Mono<Void> onAuthenticationFailure(WebFilterExchange webFilterExchange, AuthenticationException e) {

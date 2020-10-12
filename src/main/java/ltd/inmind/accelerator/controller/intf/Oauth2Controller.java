@@ -1,19 +1,19 @@
 package ltd.inmind.accelerator.controller.intf;
 
+import lombok.RequiredArgsConstructor;
 import ltd.inmind.accelerator.model.oauth2.AccessTokenResult;
 import ltd.inmind.accelerator.service.Oauth2ClientService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/oauth/2")
 public class Oauth2Controller {
 
-    @Autowired
-    private Oauth2ClientService oauth2ClientService;
+    private final Oauth2ClientService oauth2ClientService;
 
     /**
      * 授权

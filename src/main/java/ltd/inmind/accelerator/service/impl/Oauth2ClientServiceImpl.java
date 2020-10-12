@@ -1,6 +1,7 @@
 package ltd.inmind.accelerator.service.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import lombok.RequiredArgsConstructor;
 import ltd.inmind.accelerator.constants.Oauth2Const;
 import ltd.inmind.accelerator.mapper.Oauth2ClientMapper;
 import ltd.inmind.accelerator.model.oauth2.Oauth2Client;
@@ -8,20 +9,18 @@ import ltd.inmind.accelerator.service.Oauth2AccessTokenService;
 import ltd.inmind.accelerator.service.Oauth2ClientService;
 import ltd.inmind.accelerator.utils.UUIDUtil;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static ltd.inmind.accelerator.constants.Oauth2Const.EXPIRED_TIME;
 import static ltd.inmind.accelerator.constants.Oauth2Const.OAUTH2_MEM_CACHE;
 
+@RequiredArgsConstructor
 @Service
 public class Oauth2ClientServiceImpl implements Oauth2ClientService {
 
-    @Autowired
-    private Oauth2ClientMapper oauth2ClientMapper;
+    private final Oauth2ClientMapper oauth2ClientMapper;
 
-    @Autowired
-    private Oauth2AccessTokenService accessTokenService;
+    private final Oauth2AccessTokenService accessTokenService;
 
    @Override
     public boolean newClient(Oauth2Client oauth2Client) {

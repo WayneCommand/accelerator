@@ -1,23 +1,22 @@
 package ltd.inmind.accelerator.controller;
 
+import lombok.RequiredArgsConstructor;
 import ltd.inmind.accelerator.model.po.DeviceToken;
 import ltd.inmind.accelerator.model.po.UserAccount;
 import ltd.inmind.accelerator.model.vo.DataResponse;
 import ltd.inmind.accelerator.service.IDeviceTokenService;
 import ltd.inmind.accelerator.service.IUserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/device")
 public class DeviceController {
 
-    @Autowired
-    private IDeviceTokenService deviceTokenService;
+    private final IDeviceTokenService deviceTokenService;
 
-    @Autowired
-    private IUserService userService;
+    private final IUserService userService;
 
     @GetMapping("devices")
     public DataResponse devices(Authentication authentication) {

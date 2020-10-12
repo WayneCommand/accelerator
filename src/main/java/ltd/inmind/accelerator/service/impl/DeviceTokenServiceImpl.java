@@ -1,24 +1,23 @@
 package ltd.inmind.accelerator.service.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import lombok.RequiredArgsConstructor;
 import ltd.inmind.accelerator.mapper.DeviceTokenMapper;
 import ltd.inmind.accelerator.model.po.DeviceToken;
 import ltd.inmind.accelerator.service.IDeviceTokenService;
 import ltd.inmind.accelerator.service.IJwtTokenSecurityContext;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
 
+@RequiredArgsConstructor
 @Service
 public class DeviceTokenServiceImpl implements IDeviceTokenService {
 
-    @Autowired
-    private DeviceTokenMapper deviceTokenMapper;
+    private final DeviceTokenMapper deviceTokenMapper;
 
-    @Autowired
-    private IJwtTokenSecurityContext jwtTokenSecurityContext;
+    private final IJwtTokenSecurityContext jwtTokenSecurityContext;
 
     @Override
     public void saveDeviceToken(DeviceToken device) {

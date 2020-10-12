@@ -1,22 +1,23 @@
 package ltd.inmind.accelerator.security.repository;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ltd.inmind.accelerator.service.IJwtTokenSecurityContext;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
+import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import static ltd.inmind.accelerator.constants.SecurityConst.AUTHENTICATION_HEADER;
 import static ltd.inmind.accelerator.constants.SecurityConst.TOKEN_ATTR_NAME;
-
+@RequiredArgsConstructor
 @Slf4j
+@Component
 public class JwtTokenServerSecurityContextRepository implements ServerSecurityContextRepository {
 
-    @Autowired
-    private IJwtTokenSecurityContext jwtTokenSecurityContext;
+    private final IJwtTokenSecurityContext jwtTokenSecurityContext;
 
     @Override
     public Mono<Void> save(ServerWebExchange exchange, SecurityContext context) {

@@ -1,10 +1,8 @@
 package ltd.inmind.accelerator.config;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ltd.inmind.accelerator.security.filter.JwtAuthWebFilter;
-import ltd.inmind.accelerator.security.repository.JwtTokenServerSecurityContextRepository;
-import ltd.inmind.accelerator.security.service.AcceleratorReactiveUserDetailsService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UserDetailsRepositoryReactiveAuthenticationManager;
@@ -21,13 +19,16 @@ import org.springframework.security.web.server.context.ServerSecurityContextRepo
 
 @EnableWebFluxSecurity
 @Slf4j
+@RequiredArgsConstructor
 public class SecurityConfig {
 
-    @Autowired
-    private ServerAuthenticationSuccessHandler authenticationSuccessHandler;
+    private final ServerAuthenticationSuccessHandler authenticationSuccessHandler;
 
-    @Autowired
-    private ServerAuthenticationFailureHandler authenticationFailureHandler;
+    private final ServerAuthenticationFailureHandler authenticationFailureHandler;
+
+    private final ReactiveUserDetailsService reactiveUserDetailsService;
+
+    private final ServerSecurityContextRepository serverSecurityContextRepository;
 
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
@@ -38,7 +39,7 @@ public class SecurityConfig {
                 .csrf().disable()
                 .httpBasic().disable()
                 .formLogin().disable()
-                .securityContextRepository(securityContextRepository())
+                .securityContextRepository(serverSecurityContextRepository)
                 .addFilterAt(jwtAuthWebFilter(), SecurityWebFiltersOrder.FORM_LOGIN)
 
                 .authorizeExchange()
@@ -54,30 +55,19 @@ public class SecurityConfig {
     }
 
     @Bean
-    public ReactiveUserDetailsService reactiveUserDetailsService(){
-        return new AcceleratorReactiveUserDetailsService();
-    }
-
-    @Bean
     public PasswordEncoder passwordEncoder(){
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
-    @Bean
-    public ServerSecurityContextRepository securityContextRepository() {
-        return new JwtTokenServerSecurityContextRepository();
-    }
-
     private JwtAuthWebFilter jwtAuthWebFilter() {
 
-        return new JwtAuthWebFilter(reactiveAuthenticationManager(), securityContextRepository(),
+        return new JwtAuthWebFilter(reactiveAuthenticationManager(), serverSecurityContextRepository,
                 authenticationSuccessHandler, authenticationFailureHandler);
     }
 
-    @Bean
-    public ReactiveAuthenticationManager reactiveAuthenticationManager(){
+    private ReactiveAuthenticationManager reactiveAuthenticationManager(){
 
-        return new UserDetailsRepositoryReactiveAuthenticationManager(reactiveUserDetailsService());
+        return new UserDetailsRepositoryReactiveAuthenticationManager(reactiveUserDetailsService);
     }
 
 }

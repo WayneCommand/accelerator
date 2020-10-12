@@ -23,22 +23,22 @@ import reactor.core.publisher.Mono;
 
 public class JwtAuthWebFilter implements WebFilter {
 
-    private ServerWebExchangeMatcher matcher = ServerWebExchangeMatchers
+    private final ServerWebExchangeMatcher matcher = ServerWebExchangeMatchers
             .pathMatchers(HttpMethod.POST, "/login");
 
     private final ReactiveAuthenticationManagerResolver<ServerHttpRequest> authenticationManagerResolver;
 
     //想办法怎么从spring security里拿出来
-    private ServerSecurityContextRepository securityContextRepository;
+    private final ServerSecurityContextRepository securityContextRepository;
 
-    private ServerAuthenticationSuccessHandler authenticationSuccessHandler;
+    private final ServerAuthenticationSuccessHandler authenticationSuccessHandler;
 
-    private ServerAuthenticationFailureHandler authenticationFailureHandler;
+    private final ServerAuthenticationFailureHandler authenticationFailureHandler;
 
 
-    private String usernameParameter = "username";
+    private final String usernameParameter = "username";
 
-    private String passwordParameter = "password";
+    private final String passwordParameter = "password";
 
     public JwtAuthWebFilter(ReactiveAuthenticationManager authenticationManager, ServerSecurityContextRepository serverSecurityContextRepository,
                             ServerAuthenticationSuccessHandler serverAuthenticationSuccessHandler, ServerAuthenticationFailureHandler serverAuthenticationFailureHandler) {

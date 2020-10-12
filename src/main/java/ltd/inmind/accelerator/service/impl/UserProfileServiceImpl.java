@@ -1,20 +1,20 @@
 package ltd.inmind.accelerator.service.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import lombok.RequiredArgsConstructor;
 import ltd.inmind.accelerator.exception.AcceleratorException;
 import ltd.inmind.accelerator.mapper.UserProfileMapper;
 import ltd.inmind.accelerator.model.po.UserProfile;
 import ltd.inmind.accelerator.service.IUserProfileService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static ltd.inmind.accelerator.constants.ExceptionConst.SYSTEM_BUG;
 
+@RequiredArgsConstructor
 @Service
 public class UserProfileServiceImpl implements IUserProfileService {
 
-    @Autowired
-    private UserProfileMapper userProfileMapper;
+    private final UserProfileMapper userProfileMapper;
 
 
     @Override

@@ -1,24 +1,27 @@
 package ltd.inmind.accelerator.security.service;
 
+import lombok.RequiredArgsConstructor;
 import ltd.inmind.accelerator.service.IUserAccountService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 
+@RequiredArgsConstructor
+@Service
 public class AcceleratorReactiveUserDetailsService implements ReactiveUserDetailsService {
 
-    @Autowired
-    private IUserAccountService userAccountService;
+    private final IUserAccountService userAccountService;
 
     @Override
     public Mono<UserDetails> findByUsername(String username) {
 
         return Mono.justOrEmpty(userAccountService.getByAccount(username))
                 .map(byAccount ->
-                        new org.springframework.security.core.userdetails.User(byAccount.getAccount(),
+                        new User(byAccount.getAccount(),
                                 byAccount.getPassword(),
                                 Collections.emptyList()));
     }

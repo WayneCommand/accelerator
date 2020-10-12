@@ -1,5 +1,6 @@
 package ltd.inmind.accelerator.service.impl;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ltd.inmind.accelerator.model.po.DeviceToken;
 import ltd.inmind.accelerator.model.po.UserAccount;
@@ -12,7 +13,6 @@ import ltd.inmind.accelerator.service.*;
 import ltd.inmind.accelerator.utils.KVPlusMap;
 import ltd.inmind.accelerator.utils.RandomUtil;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,26 +23,22 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@RequiredArgsConstructor
 @Service
 @Slf4j
 public class UserServiceImpl implements IUserService {
 
-    @Autowired
-    private IUserAccountService userAccountService;
+    private final IUserAccountService userAccountService;
 
-    @Autowired
-    private IUserProfileService userProfileService;
+    private final IUserProfileService userProfileService;
 
-    @Autowired
-    private IDeviceTokenService deviceTokenService;
+    private final IDeviceTokenService deviceTokenService;
 
-    @Autowired
-    private IJwtTokenSecurityContext jwtTokenSecurityContext;
+    private final IJwtTokenSecurityContext jwtTokenSecurityContext;
 
-    @Autowired
-    private ReactiveUserDetailsService reactiveUserDetailsService;
+    private final ReactiveUserDetailsService reactiveUserDetailsService;
 
-    private KVPlusMap<String, String> verifyCache = new KVPlusMap<>();
+    private final KVPlusMap<String, String> verifyCache = new KVPlusMap<>();
 
     @Override
     @Transactional

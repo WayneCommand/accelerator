@@ -1,7 +1,5 @@
 # `一方通行`用户认证服务
 
-> 立个flag 预计将在2020/8/8正式上线。 -> [http://accelerator.inmind.ltd](http://accelerator.inmind.ltd)
-
 ### 该项目存在的理由如下
   - 以后将会用于我其他项目的用户认证。
   - 使用最新的依赖，学习新特性，踩坑等等。

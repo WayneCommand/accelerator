@@ -1,11 +1,12 @@
 package ltd.inmind.accelerator.service.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import lombok.RequiredArgsConstructor;
 import ltd.inmind.accelerator.exception.AcceleratorException;
 import ltd.inmind.accelerator.mapper.UserAccountMapper;
 import ltd.inmind.accelerator.model.po.UserAccount;
 import ltd.inmind.accelerator.service.IUserAccountService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -15,13 +16,12 @@ import static ltd.inmind.accelerator.constants.ExceptionConst.USER_ALREADY_EXIST
 import static ltd.inmind.accelerator.constants.ExceptionConst.USER_NOT_EXIST;
 
 @Service
+@RequiredArgsConstructor
 public class UserAccountServiceImpl implements IUserAccountService {
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
 
-    @Autowired
-    private UserAccountMapper userAccountMapper;
+    private final UserAccountMapper userAccountMapper;
 
 
     @Override

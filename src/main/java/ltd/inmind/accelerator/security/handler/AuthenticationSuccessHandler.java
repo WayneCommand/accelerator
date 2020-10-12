@@ -1,7 +1,7 @@
 package ltd.inmind.accelerator.security.handler;
 
 import com.google.gson.Gson;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ltd.inmind.accelerator.exception.AcceleratorException;
 import ltd.inmind.accelerator.model.po.DeviceToken;
@@ -9,7 +9,6 @@ import ltd.inmind.accelerator.model.vo.DataResponse;
 import ltd.inmind.accelerator.service.IDeviceTokenService;
 import ltd.inmind.accelerator.service.IUserService;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpResponse;
@@ -27,19 +26,16 @@ import static ltd.inmind.accelerator.constants.SecurityConst.AUTHENTICATION_HEAD
 import static ltd.inmind.accelerator.constants.SecurityConst.TOKEN_ATTR_NAME;
 
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Component
 @Slf4j
 public class AuthenticationSuccessHandler implements ServerAuthenticationSuccessHandler {
 
-    @Autowired
-    private Gson gson;
+    private final Gson gson;
 
-    @Autowired
-    private IDeviceTokenService deviceTokenService;
+    private final IDeviceTokenService deviceTokenService;
 
-    @Autowired
-    private IUserService userService;
+    private final IUserService userService;
 
     @Override
     public Mono<Void> onAuthenticationSuccess(WebFilterExchange webFilterExchange, Authentication authentication) {

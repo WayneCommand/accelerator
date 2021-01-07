@@ -17,6 +17,7 @@ import static ltd.inmind.accelerator.constants.SecurityConst.AUTHENTICATION_HEAD
 public class WebFluxConfig implements WebFluxConfigurer {
 
     private CorsConfiguration buildConfig() {
+        //以后考虑在上层做跨域控制
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         corsConfiguration.addAllowedOrigin("http://127.0.0.1:8080");
         corsConfiguration.addAllowedOrigin("http://localhost:8080");

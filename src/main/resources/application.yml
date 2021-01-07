@@ -6,11 +6,8 @@ spring:
     name: accelerator
 
   datasource:
-    driver-class-name: org.mariadb.jdbc.Driver
-    #url: jdbc:mariadb://10.68.165.163:3306/mycloud
-    url: jdbc:mariadb://127.0.0.1:3306/mycloud
-    username: shenlan
-    password: password
+    driver-class-name: org.sqlite.JDBC
+    url: jdbc:sqlite:C:\Users\shenlan\mycloud.sqlite
     type: com.zaxxer.hikari.HikariDataSource
 
   mvc:

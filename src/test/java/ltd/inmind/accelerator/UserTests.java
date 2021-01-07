@@ -7,19 +7,16 @@ import ltd.inmind.accelerator.model.oauth2.Oauth2Client;
 import ltd.inmind.accelerator.service.IJwtTokenSecurityContext;
 import ltd.inmind.accelerator.service.IUserAccountService;
 import ltd.inmind.accelerator.service.IUserService;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
-import org.springframework.test.context.junit4.SpringRunner;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
 
 @RequiredArgsConstructor
-@RunWith(SpringRunner.class)
 @SpringBootTest
-public class UserTests {
+class UserTests {
 
     private UserAccountMapper userAccountMapper;
 
@@ -35,7 +32,7 @@ public class UserTests {
 
 
     @Test
-    public void selectAll() {
+    void selectAll() {
         userAccountMapper.selectList(null)
                 .forEach(System.out::println);
 
@@ -44,13 +41,13 @@ public class UserTests {
 
 
     @Test
-    public void testRegister() {
+    void testRegister() {
         userService.signUp("shenlan","123456");
 
     }
 
     @Test
-    public void testJwtToken() {
+    void testJwtToken() {
 
         jwtTokenSecurityContext.create(Mono.empty())
                 .subscribe(System.out::println);

@@ -1,42 +1,44 @@
 package ltd.inmind.accelerator;
 
-import lombok.RequiredArgsConstructor;
 import ltd.inmind.accelerator.mapper.Oauth2ClientMapper;
 import ltd.inmind.accelerator.mapper.UserAccountMapper;
-import ltd.inmind.accelerator.model.oauth2.Oauth2Client;
 import ltd.inmind.accelerator.service.IJwtTokenSecurityContext;
 import ltd.inmind.accelerator.service.IUserAccountService;
 import ltd.inmind.accelerator.service.IUserService;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
-
-@RequiredArgsConstructor
+//@ExtendWith(SpringExtension.class)
 @SpringBootTest
 class UserTests {
 
+    @Autowired
     private UserAccountMapper userAccountMapper;
 
+    @Autowired
     private IUserAccountService userAccountService;
 
+    @Autowired
     private IUserService userService;
 
+    @Autowired
     private Oauth2ClientMapper oauth2ClientMapper;
 
+    @Autowired
     private IJwtTokenSecurityContext jwtTokenSecurityContext;
 
+    @Autowired
     private ReactiveUserDetailsService reactiveUserDetailsService;
-
 
     @Test
     void selectAll() {
         userAccountMapper.selectList(null)
                 .forEach(System.out::println);
 
-        List<Oauth2Client> oauth2Clients = oauth2ClientMapper.selectList(null);
+        //List<Oauth2Client> oauth2Clients = oauth2ClientMapper.selectList(null);
     }
 
 

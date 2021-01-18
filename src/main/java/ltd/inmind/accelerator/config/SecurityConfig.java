@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ltd.inmind.accelerator.security.filter.JwtAuthWebFilter;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UserDetailsRepositoryReactiveAuthenticationManager;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
@@ -13,6 +14,7 @@ import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.web.server.authentication.HttpStatusServerEntryPoint;
 import org.springframework.security.web.server.authentication.ServerAuthenticationFailureHandler;
 import org.springframework.security.web.server.authentication.ServerAuthenticationSuccessHandler;
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
@@ -41,15 +43,17 @@ public class SecurityConfig {
                 .formLogin().disable()
                 .securityContextRepository(serverSecurityContextRepository)
                 .addFilterAt(jwtAuthWebFilter(), SecurityWebFiltersOrder.FORM_LOGIN)
-
-                .authorizeExchange()
-                .pathMatchers("/login/lookup","/login/signUp")
-                .permitAll()
-
-                .and()
-                .authorizeExchange()
-                .anyExchange()
-                .authenticated();
+                .authorizeExchange(a -> a
+                        .pathMatchers("/login/lookup", "/login/signUp", "/oauth/2/*")
+                        .permitAll()
+                )
+                .authorizeExchange(a -> a
+                        .anyExchange()
+                        .authenticated()
+                )
+                .exceptionHandling(e -> e
+                        .authenticationEntryPoint(new HttpStatusServerEntryPoint(HttpStatus.UNAUTHORIZED))
+                );
 
         return http.build();
     }

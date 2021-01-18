@@ -11,6 +11,8 @@ import ltd.inmind.accelerator.utils.UUIDUtil;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 import static ltd.inmind.accelerator.constants.Oauth2Const.EXPIRED_TIME;
 import static ltd.inmind.accelerator.constants.Oauth2Const.OAUTH2_MEM_CACHE;
 
@@ -102,4 +104,8 @@ public class Oauth2ClientServiceImpl implements Oauth2ClientService {
         return accessToken;
     }
 
+    @Override
+    public List<Oauth2Client> list() {
+        return oauth2ClientMapper.selectList(Wrappers.emptyWrapper());
+    }
 }

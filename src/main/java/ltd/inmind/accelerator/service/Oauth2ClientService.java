@@ -2,6 +2,8 @@ package ltd.inmind.accelerator.service;
 
 import ltd.inmind.accelerator.model.oauth2.Oauth2Client;
 
+import java.util.List;
+
 public interface Oauth2ClientService {
 
     /**
@@ -28,4 +30,5 @@ public interface Oauth2ClientService {
 
     String accessToken(String client_id, String client_secret, String code);
 
+    List<Oauth2Client> list();
 }

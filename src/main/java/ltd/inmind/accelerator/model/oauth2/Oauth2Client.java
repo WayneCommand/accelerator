@@ -1,13 +1,12 @@
 package ltd.inmind.accelerator.model.oauth2;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 
+import java.util.Date;
+
 @Data
-@TableName("t_oauth2_client")
+@TableName("oauth2_clients")
 public class Oauth2Client {
 
     @TableId(type = IdType.AUTO)
@@ -19,11 +18,15 @@ public class Oauth2Client {
 
     private String clientSecret;
 
-    @TableField(exist = false)
-    private transient String logo; //暂未实现
+    private transient String logo;
 
-    @TableField(exist = false)
-    private transient String description; //暂未实现
+    private transient String description;
 
     private String callbackUrl;
+
+    @TableField(fill = FieldFill.INSERT)
+    private Date createTime;
+
+    @TableField(fill = FieldFill.UPDATE)
+    private Date modifyTime;
 }

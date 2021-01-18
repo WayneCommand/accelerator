@@ -8,7 +8,7 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-@TableName("t_oauth2_access_token")
+@TableName("oauth2_access_token")
 public class Oauth2AccessToken {
 
     @TableId(type = IdType.AUTO)

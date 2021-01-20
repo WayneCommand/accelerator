@@ -15,70 +15,60 @@
  */
 package ltd.inmind.accelerator.security.oauth2.server.authorization.web;
 
+import ltd.inmind.accelerator.security.oauth2.server.authorization.authentication.OAuth2ClientAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
-import org.springframework.security.oauth2.server.authorization.authentication.OAuth2ClientAuthenticationToken;
-import org.springframework.security.web.authentication.AuthenticationConverter;
-import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
+import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Attempts to extract client credentials from POST parameters of {@link HttpServletRequest}
  * and then converts to an {@link OAuth2ClientAuthenticationToken} used for authenticating the client.
  *
  * @author Anoop Garlapati
- * @since 0.1.0
+ * @author shenlanluck@gmail.com
+ * @since 0.1.1
  * @see OAuth2ClientAuthenticationToken
  * @see OAuth2ClientAuthenticationFilter
  * @see <a target="_blank" href="https://tools.ietf.org/html/rfc6749#section-2.3.1">Section 2.3.1 Client Password</a>
  */
 public class ClientSecretPostAuthenticationConverter implements AuthenticationConverter {
 
+
 	@Override
-	public Authentication convert(HttpServletRequest request) {
-		MultiValueMap<String, String> parameters = OAuth2EndpointUtils.getParameters(request);
+	public Mono<Authentication> convert(ServerWebExchange exchange) {
+		return exchange.getFormData()
+				.flatMap(parameters -> {
 
-		// client_id (REQUIRED)
-		String clientId = parameters.getFirst(OAuth2ParameterNames.CLIENT_ID);
-		if (!StringUtils.hasText(clientId)) {
-			return null;
-		}
+					// client_id (REQUIRED)
+					String clientId = parameters.getFirst(OAuth2ParameterNames.CLIENT_ID);
+					if (!StringUtils.hasText(clientId)) {
+						return null;
+					}
 
-		if (parameters.get(OAuth2ParameterNames.CLIENT_ID).size() != 1) {
-			throw new OAuth2AuthenticationException(new OAuth2Error(OAuth2ErrorCodes.INVALID_REQUEST));
-		}
+					if (parameters.get(OAuth2ParameterNames.CLIENT_ID).size() != 1) {
+						throw new OAuth2AuthenticationException(new OAuth2Error(OAuth2ErrorCodes.INVALID_REQUEST));
+					}
 
-		// client_secret (REQUIRED)
-		String clientSecret = parameters.getFirst(OAuth2ParameterNames.CLIENT_SECRET);
-		if (!StringUtils.hasText(clientSecret)) {
-			return null;
-		}
+					// client_secret (REQUIRED)
+					String clientSecret = parameters.getFirst(OAuth2ParameterNames.CLIENT_SECRET);
+					if (!StringUtils.hasText(clientSecret)) {
+						return null;
+					}
 
-		if (parameters.get(OAuth2ParameterNames.CLIENT_SECRET).size() != 1) {
-			throw new OAuth2AuthenticationException(new OAuth2Error(OAuth2ErrorCodes.INVALID_REQUEST));
-		}
+					if (parameters.get(OAuth2ParameterNames.CLIENT_SECRET).size() != 1) {
+						throw new OAuth2AuthenticationException(new OAuth2Error(OAuth2ErrorCodes.INVALID_REQUEST));
+					}
 
-		return new OAuth2ClientAuthenticationToken(clientId, clientSecret, ClientAuthenticationMethod.POST,
-				extractAdditionalParameters(request));
-	}
-
-	private static Map<String, Object> extractAdditionalParameters(HttpServletRequest request) {
-		Map<String, Object> additionalParameters = Collections.emptyMap();
-		if (OAuth2EndpointUtils.matchesPkceTokenRequest(request)) {
-			// Confidential clients can also leverage PKCE
-			additionalParameters = new HashMap<>(OAuth2EndpointUtils.getParameters(request).toSingleValueMap());
-			additionalParameters.remove(OAuth2ParameterNames.CLIENT_ID);
-			additionalParameters.remove(OAuth2ParameterNames.CLIENT_SECRET);
-		}
-		return additionalParameters;
+					return Mono.just(new OAuth2ClientAuthenticationToken(clientId, clientSecret, ClientAuthenticationMethod.POST,
+							new HashMap<>(parameters.toSingleValueMap())));
+				});
 	}
 }

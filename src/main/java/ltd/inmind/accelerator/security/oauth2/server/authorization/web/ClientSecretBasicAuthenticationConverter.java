@@ -22,36 +22,38 @@ import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
-import org.springframework.security.web.authentication.AuthenticationConverter;
 import org.springframework.util.StringUtils;
+import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
- * Attempts to extract HTTP Basic credentials from {@link HttpServletRequest}
+ * Attempts to extract HTTP Basic credentials from {@link ServerWebExchange}
  * and then converts to an {@link OAuth2ClientAuthenticationToken} used for authenticating the client.
  *
  * @author Patryk Kostrzewa
  * @author Joe Grandja
- * @since 0.0.1
+ * @author shenlanluck@gmail.com
+ * @since 0.0.2
  * @see OAuth2ClientAuthenticationToken
  * @see OAuth2ClientAuthenticationFilter
  */
 public class ClientSecretBasicAuthenticationConverter implements AuthenticationConverter {
 
 	@Override
-	public Authentication convert(HttpServletRequest request) {
-		String header = request.getHeader(HttpHeaders.AUTHORIZATION);
-		if (header == null) {
+	public Mono<Authentication> convert(ServerWebExchange exchange) {
+
+		List<String> header = exchange.getRequest()
+				.getHeaders()
+				.get(HttpHeaders.AUTHORIZATION);
+		if (header == null || header.isEmpty()) {
 			return null;
 		}
 
-		String[] parts = header.split("\\s");
+		String[] parts = header.get(0).split("\\s");
 		if (!parts[0].equalsIgnoreCase("Basic")) {
 			return null;
 		}
@@ -85,16 +87,11 @@ public class ClientSecretBasicAuthenticationConverter implements AuthenticationC
 			throw new OAuth2AuthenticationException(new OAuth2Error(OAuth2ErrorCodes.INVALID_REQUEST), ex);
 		}
 
-		return new OAuth2ClientAuthenticationToken(clientID, clientSecret, ClientAuthenticationMethod.BASIC,
-				extractAdditionalParameters(request));
-	}
+		return exchange.getFormData()
+				.flatMap(form -> {
+					return Mono.just(new OAuth2ClientAuthenticationToken(clientID, clientSecret, ClientAuthenticationMethod.BASIC,
+							new HashMap<>(form.toSingleValueMap())));
+				});
 
-	private static Map<String, Object> extractAdditionalParameters(HttpServletRequest request) {
-		Map<String, Object> additionalParameters = Collections.emptyMap();
-		if (OAuth2EndpointUtils.matchesPkceTokenRequest(request)) {
-			// Confidential clients can also leverage PKCE
-			additionalParameters = new HashMap<>(OAuth2EndpointUtils.getParameters(request).toSingleValueMap());
-		}
-		return additionalParameters;
 	}
 }

@@ -22,18 +22,19 @@ import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.security.oauth2.core.endpoint.PkceParameterNames;
-import org.springframework.security.web.authentication.AuthenticationConverter;
-import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
+import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
 
 import java.util.HashMap;
 
 /**
- * Attempts to extract the parameters from {@link HttpServletRequest}
+ * Attempts to extract the parameters from {@link ServerWebExchange}
  * used for authenticating public clients using Proof Key for Code Exchange (PKCE).
  *
  * @author Joe Grandja
- * @since 0.0.2
+ * @author shenlanluck@gmail.com
+ * @since 0.0.3
  * @see AuthenticationConverter
  * @see OAuth2ClientAuthenticationToken
  * @see OAuth2ClientAuthenticationFilter
@@ -42,28 +43,26 @@ import java.util.HashMap;
 public class PublicClientAuthenticationConverter implements AuthenticationConverter {
 
 	@Override
-	public Authentication convert(HttpServletRequest request) {
-		if (!OAuth2EndpointUtils.matchesPkceTokenRequest(request)) {
-			return null;
-		}
+	public Mono<Authentication> convert(ServerWebExchange exchange) {
 
-		MultiValueMap<String, String> parameters = OAuth2EndpointUtils.getParameters(request);
+		return exchange.getFormData()
+				.flatMap(parameters -> {
+					// client_id (REQUIRED for public clients)
+					String clientId = parameters.getFirst(OAuth2ParameterNames.CLIENT_ID);
+					if (!StringUtils.hasText(clientId) ||
+							parameters.get(OAuth2ParameterNames.CLIENT_ID).size() != 1) {
+						throw new OAuth2AuthenticationException(new OAuth2Error(OAuth2ErrorCodes.INVALID_REQUEST));
+					}
 
-		// client_id (REQUIRED for public clients)
-		String clientId = parameters.getFirst(OAuth2ParameterNames.CLIENT_ID);
-		if (!StringUtils.hasText(clientId) ||
-				parameters.get(OAuth2ParameterNames.CLIENT_ID).size() != 1) {
-			throw new OAuth2AuthenticationException(new OAuth2Error(OAuth2ErrorCodes.INVALID_REQUEST));
-		}
+					// code_verifier (REQUIRED)
+					if (parameters.get(PkceParameterNames.CODE_VERIFIER).size() != 1) {
+						throw new OAuth2AuthenticationException(new OAuth2Error(OAuth2ErrorCodes.INVALID_REQUEST));
+					}
 
-		// code_verifier (REQUIRED)
-		if (parameters.get(PkceParameterNames.CODE_VERIFIER).size() != 1) {
-			throw new OAuth2AuthenticationException(new OAuth2Error(OAuth2ErrorCodes.INVALID_REQUEST));
-		}
+					parameters.remove(OAuth2ParameterNames.CLIENT_ID);
 
-		parameters.remove(OAuth2ParameterNames.CLIENT_ID);
-
-		return new OAuth2ClientAuthenticationToken(
-				clientId, new HashMap<>(parameters.toSingleValueMap()));
+					return Mono.just(new OAuth2ClientAuthenticationToken(
+							clientId, new HashMap<>(parameters.toSingleValueMap())));
+				});
 	}
 }

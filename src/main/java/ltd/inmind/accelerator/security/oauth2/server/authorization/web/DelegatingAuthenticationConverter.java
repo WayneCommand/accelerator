@@ -17,10 +17,10 @@ package ltd.inmind.accelerator.security.oauth2.server.authorization.web;
 
 import org.springframework.lang.Nullable;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.web.authentication.AuthenticationConverter;
 import org.springframework.util.Assert;
+import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -31,12 +31,13 @@ import java.util.Objects;
  * internal {@code List} of {@link AuthenticationConverter}(s).
  * <p>
  * Each {@link AuthenticationConverter} is given a chance to
- * {@link AuthenticationConverter#convert(HttpServletRequest)}
+ * {@link AuthenticationConverter#convert(ServerWebExchange)}
  * with the first {@code non-null} {@link Authentication} being returned.
  *
  * @author Joe Grandja
- * @since 0.0.2
+ * @author shenlanluck@gmail.com
  * @see AuthenticationConverter
+ * @since 0.0.3
  */
 public final class DelegatingAuthenticationConverter implements AuthenticationConverter {
 	private final List<AuthenticationConverter> converters;
@@ -53,14 +54,14 @@ public final class DelegatingAuthenticationConverter implements AuthenticationCo
 
 	@Nullable
 	@Override
-	public Authentication convert(HttpServletRequest request) {
-		Assert.notNull(request, "request cannot be null");
-		// @formatter:off
+	public Mono<Authentication> convert(ServerWebExchange exchange) {
+		Assert.notNull(exchange,"exchange cannot be null");
+
 		return this.converters.stream()
-				.map(converter -> converter.convert(request))
+				.map(converter -> converter.convert(exchange))
 				.filter(Objects::nonNull)
 				.findFirst()
-				.orElse(null);
-		// @formatter:on
+				.orElse(Mono.empty());
 	}
+
 }

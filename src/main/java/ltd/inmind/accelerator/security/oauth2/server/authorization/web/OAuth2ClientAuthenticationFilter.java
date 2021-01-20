@@ -27,12 +27,16 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
 import org.springframework.security.oauth2.core.http.converter.OAuth2ErrorHttpMessageConverter;
-import org.springframework.security.web.authentication.AuthenticationConverter;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.server.WebFilterExchange;
+import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.util.Assert;
-import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.server.WebFilter;
+import org.springframework.web.server.WebFilterChain;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -42,15 +46,16 @@ import java.util.Arrays;
  *
  * @author Joe Grandja
  * @author Patryk Kostrzewa
+ * @author shenlanluck@gmail.com
  * @since 0.0.1
  * @see AuthenticationManager
  * @see OAuth2ClientAuthenticationProvider
  * @see <a target="_blank" href="https://tools.ietf.org/html/rfc6749#section-2.3">Section 2.3 Client Authentication</a>
  * @see <a target="_blank" href="https://tools.ietf.org/html/rfc6749#section-3.2.1">Section 3.2.1 Token Endpoint Client Authentication</a>
  */
-public class OAuth2ClientAuthenticationFilter extends OncePerRequestFilter {
+public class OAuth2ClientAuthenticationFilter implements WebFilter {
 	private final AuthenticationManager authenticationManager;
-	private final RequestMatcher requestMatcher;
+	private final ServerWebExchangeMatcher exchangeMatcher;
 	private final HttpMessageConverter<OAuth2Error> errorHttpResponseConverter = new OAuth2ErrorHttpMessageConverter();
 	private AuthenticationConverter authenticationConverter;
 	private AuthenticationSuccessHandler authenticationSuccessHandler;
@@ -63,11 +68,11 @@ public class OAuth2ClientAuthenticationFilter extends OncePerRequestFilter {
 	 * @param requestMatcher the {@link RequestMatcher} used for matching against the {@code HttpServletRequest}
 	 */
 	public OAuth2ClientAuthenticationFilter(AuthenticationManager authenticationManager,
-			RequestMatcher requestMatcher) {
+											ServerWebExchangeMatcher exchangeMatcher) {
 		Assert.notNull(authenticationManager, "authenticationManager cannot be null");
-		Assert.notNull(requestMatcher, "requestMatcher cannot be null");
+		Assert.notNull(exchangeMatcher, "requestMatcher cannot be null");
 		this.authenticationManager = authenticationManager;
-		this.requestMatcher = requestMatcher;
+		this.exchangeMatcher = exchangeMatcher;
 		this.authenticationConverter = new DelegatingAuthenticationConverter(
 				Arrays.asList(
 						new ClientSecretBasicAuthenticationConverter(),
@@ -76,26 +81,6 @@ public class OAuth2ClientAuthenticationFilter extends OncePerRequestFilter {
 		this.authenticationSuccessHandler = this::onAuthenticationSuccess;
 		this.authenticationFailureHandler = this::onAuthenticationFailure;
 	}
-
-	@Override
-	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-			throws ServletException, IOException {
-
-		if (this.requestMatcher.matches(request)) {
-			try {
-				Authentication authenticationRequest = this.authenticationConverter.convert(request);
-				if (authenticationRequest != null) {
-					Authentication authenticationResult = this.authenticationManager.authenticate(authenticationRequest);
-					this.authenticationSuccessHandler.onAuthenticationSuccess(request, response, authenticationResult);
-				}
-			} catch (OAuth2AuthenticationException failed) {
-				this.authenticationFailureHandler.onAuthenticationFailure(request, response, failed);
-				return;
-			}
-		}
-		filterChain.doFilter(request, response);
-	}
-
 	/**
 	 * Sets the {@link AuthenticationConverter} used for converting a {@link HttpServletRequest} to an {@link OAuth2ClientAuthenticationToken}.
 	 *
@@ -156,4 +141,30 @@ public class OAuth2ClientAuthenticationFilter extends OncePerRequestFilter {
 		}
 		this.errorHttpResponseConverter.write(error, null, httpResponse);
 	}
+
+	@Override
+	public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
+
+		return this.exchangeMatcher.matches(exchange)
+				.filter(ServerWebExchangeMatcher.MatchResult::isMatch)
+				.flatMap( matchResult -> this.authenticationConverter.convert(exchange))
+				.switchIfEmpty(chain.filter(exchange).then(Mono.empty()))
+				.flatMap( token -> {
+					Authentication authenticationResult = this.authenticationManager.authenticate(token);
+					this.authenticationSuccessHandler.onAuthenticationSuccess(request, response, authenticationResult);
+				});
+	}
+
+	private Mono<Void> authenticate(ServerWebExchange exchange,
+									WebFilterChain chain, Authentication token) {
+		WebFilterExchange webFilterExchange = new WebFilterExchange(exchange, chain);
+
+		return this.authenticationManagerResolver.resolve(exchange.getRequest())
+				.flatMap(authenticationManager -> authenticationManager.authenticate(token))
+				.switchIfEmpty(Mono.defer(() -> Mono.error(new IllegalStateException("No provider found for " + token.getClass()))))
+				.flatMap(authentication -> onAuthenticationSuccess(authentication, webFilterExchange))
+				.onErrorResume(AuthenticationException.class, e -> this.authenticationFailureHandler
+						.onAuthenticationFailure(webFilterExchange, e));
+	}
+
 }

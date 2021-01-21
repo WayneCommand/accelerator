@@ -21,29 +21,30 @@ import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.http.server.reactive.ServerHttpResponse;
+import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
+import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
 import org.springframework.util.Assert;
-import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.server.WebFilter;
+import org.springframework.web.server.WebFilterChain;
+import reactor.core.publisher.Mono;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 
 /**
  * A {@code Filter} that processes JWK Set requests.
  *
  * @author Joe Grandja
- * @since 0.0.1
+ * @author shenlanluck@gmail.com
+ * @since 0.0.2
  * @see JWKSource
  * @see <a target="_blank" href="https://tools.ietf.org/html/rfc7517">JSON Web Key (JWK)</a>
  * @see <a target="_blank" href="https://tools.ietf.org/html/rfc7517#section-5">Section 5 JWK Set Format</a>
  */
-public class NimbusJwkSetEndpointFilter extends OncePerRequestFilter {
+public class NimbusJwkSetEndpointFilter implements WebFilter {
 	/**
 	 * The default endpoint {@code URI} for JWK Set requests.
 	 */
@@ -51,7 +52,7 @@ public class NimbusJwkSetEndpointFilter extends OncePerRequestFilter {
 
 	private final JWKSource<SecurityContext> jwkSource;
 	private final JWKSelector jwkSelector;
-	private final RequestMatcher requestMatcher;
+	private final ServerWebExchangeMatcher exchangeMatcher;
 
 	/**
 	 * Constructs a {@code NimbusJwkSetEndpointFilter} using the provided parameters.
@@ -72,29 +73,30 @@ public class NimbusJwkSetEndpointFilter extends OncePerRequestFilter {
 		Assert.hasText(jwkSetEndpointUri, "jwkSetEndpointUri cannot be empty");
 		this.jwkSource = jwkSource;
 		this.jwkSelector = new JWKSelector(new JWKMatcher.Builder().publicOnly(true).build());
-		this.requestMatcher = new AntPathRequestMatcher(jwkSetEndpointUri, HttpMethod.GET.name());
+		this.exchangeMatcher = ServerWebExchangeMatchers.pathMatchers(HttpMethod.POST, jwkSetEndpointUri);
 	}
 
 	@Override
-	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-			throws ServletException, IOException {
+	public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
 
-		if (!this.requestMatcher.matches(request)) {
-			filterChain.doFilter(request, response);
-			return;
-		}
+		return this.exchangeMatcher.matches(exchange)
+				.filter(ServerWebExchangeMatcher.MatchResult::isMatch)
+				.flatMap(r -> {
+					try {
+						return Mono.just(new JWKSet(this.jwkSource.get(this.jwkSelector, null)));
+					} catch (Exception ex) {
+						return Mono.error(new IllegalStateException("Failed to select the JWK public key(s) -> " + ex.getMessage(), ex));
+					}
+				})
+				.switchIfEmpty(chain.filter(exchange).then(Mono.empty()))
+				.flatMap(jwkSet -> {
+					ServerHttpResponse response = exchange.getResponse();
+					response.setStatusCode(HttpStatus.OK);
+					response.getHeaders().add("Content-Type", MediaType.APPLICATION_JSON_VALUE);
 
-		JWKSet jwkSet;
-		try {
-			jwkSet = new JWKSet(this.jwkSource.get(this.jwkSelector, null));
-		}
-		catch (Exception ex) {
-			throw new IllegalStateException("Failed to select the JWK public key(s) -> " + ex.getMessage(), ex);
-		}
+					return response.writeWith(Mono.just(response.bufferFactory()
+							.wrap(jwkSet.toString().getBytes(StandardCharsets.UTF_8))));
+				});
 
-		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-		try (Writer writer = response.getWriter()) {
-			writer.write(jwkSet.toString());
-		}
 	}
 }

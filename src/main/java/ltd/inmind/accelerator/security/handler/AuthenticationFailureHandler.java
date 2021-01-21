@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import ltd.inmind.accelerator.model.vo.DataResponse;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
@@ -26,7 +27,7 @@ public class AuthenticationFailureHandler implements ServerAuthenticationFailure
         ServerHttpResponse response = webFilterExchange.getExchange().getResponse();
         response.setStatusCode(HttpStatus.OK);
         response.getHeaders()
-                .add("Content-Type", "application/json");
+                .add("Content-Type", MediaType.APPLICATION_JSON_VALUE);
 
         DataResponse dataResponse;
         if (e instanceof BadCredentialsException){

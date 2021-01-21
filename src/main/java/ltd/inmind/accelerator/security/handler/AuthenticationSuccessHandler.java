@@ -11,6 +11,7 @@ import ltd.inmind.accelerator.service.IUserService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.server.WebFilterExchange;
@@ -41,7 +42,7 @@ public class AuthenticationSuccessHandler implements ServerAuthenticationSuccess
     public Mono<Void> onAuthenticationSuccess(WebFilterExchange webFilterExchange, Authentication authentication) {
         ServerHttpResponse response = webFilterExchange.getExchange().getResponse();
         response.setStatusCode(HttpStatus.OK);
-        response.getHeaders().add("Content-Type", "application/json");
+        response.getHeaders().add("Content-Type", MediaType.APPLICATION_JSON_VALUE);
         response.getHeaders().add(AUTHENTICATION_HEADER, webFilterExchange.getExchange().getAttribute(TOKEN_ATTR_NAME));
 
         DataResponse dataResponse = new DataResponse()

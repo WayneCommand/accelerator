@@ -21,9 +21,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
+import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,8 +35,8 @@ import java.util.Map;
  * @author Alexey Nesterov
  * @since 0.0.1
  */
-public final class DelegatingAuthorizationGrantAuthenticationConverter implements Converter<HttpServletRequest, Authentication> {
-	private final Map<AuthorizationGrantType, Converter<HttpServletRequest, Authentication>> converters;
+public final class DelegatingAuthorizationGrantAuthenticationConverter implements Converter<ServerWebExchange, Mono<Authentication>> {
+	private final Map<AuthorizationGrantType, Converter<ServerWebExchange, Mono<Authentication>>> converters;
 
 	/**
 	 * Constructs a {@code DelegatingAuthorizationGrantAuthenticationConverter} using the provided parameters.
@@ -44,27 +44,21 @@ public final class DelegatingAuthorizationGrantAuthenticationConverter implement
 	 * @param converters a {@code Map} of {@link Converter}(s)
 	 */
 	public DelegatingAuthorizationGrantAuthenticationConverter(
-			Map<AuthorizationGrantType, Converter<HttpServletRequest, Authentication>> converters) {
+			Map<AuthorizationGrantType, Converter<ServerWebExchange, Mono<Authentication>>> converters) {
 		Assert.notEmpty(converters, "converters cannot be empty");
 		this.converters = Collections.unmodifiableMap(new HashMap<>(converters));
 	}
 
 	@Nullable
 	@Override
-	public Authentication convert(HttpServletRequest request) {
-		Assert.notNull(request, "request cannot be null");
+	public Mono<Authentication> convert(ServerWebExchange exchange) {
+		Assert.notNull(exchange, "exchange cannot be null");
 
-		String grantType = request.getParameter(OAuth2ParameterNames.GRANT_TYPE);
-		if (StringUtils.isEmpty(grantType)) {
-			return null;
-		}
-
-		Converter<HttpServletRequest, Authentication> converter =
-				this.converters.get(new AuthorizationGrantType(grantType));
-		if (converter == null) {
-			return null;
-		}
-
-		return converter.convert(request);
+		return exchange.getFormData()
+				.map(form -> form.getFirst(OAuth2ParameterNames.GRANT_TYPE))
+				.switchIfEmpty(Mono.empty())
+				.map(grantType -> this.converters.get(new AuthorizationGrantType(grantType)))
+				.switchIfEmpty(Mono.empty())
+				.flatMap(converters -> converters.convert(exchange));
 	}
 }

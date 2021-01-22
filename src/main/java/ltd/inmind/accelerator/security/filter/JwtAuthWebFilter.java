@@ -90,7 +90,7 @@ public class JwtAuthWebFilter implements WebFilter {
         return this.securityContextRepository.save(exchange, securityContext)
                 .then(this.authenticationSuccessHandler
                         .onAuthenticationSuccess(webFilterExchange, authentication))
-                .subscriberContext(ReactiveSecurityContextHolder.withSecurityContext(Mono.just(securityContext)));
+                .contextWrite(context -> ReactiveSecurityContextHolder.withSecurityContext(Mono.just(securityContext)));
     }
 
 

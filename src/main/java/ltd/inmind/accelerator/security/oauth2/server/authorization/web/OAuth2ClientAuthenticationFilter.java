@@ -15,30 +15,27 @@
  */
 package ltd.inmind.accelerator.security.oauth2.server.authorization.web;
 
+import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.server.ServletServerHttpResponse;
+import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
-import org.springframework.security.oauth2.core.http.converter.OAuth2ErrorHttpMessageConverter;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.server.WebFilterExchange;
+import org.springframework.security.web.server.authentication.ServerAuthenticationFailureHandler;
+import org.springframework.security.web.server.authentication.ServerAuthenticationSuccessHandler;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
-import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.util.Assert;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 
-import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 /**
@@ -47,30 +44,28 @@ import java.util.Arrays;
  * @author Joe Grandja
  * @author Patryk Kostrzewa
  * @author shenlanluck@gmail.com
- * @since 0.0.1
+ * @since 0.0.2
  * @see AuthenticationManager
- * @see OAuth2ClientAuthenticationProvider
  * @see <a target="_blank" href="https://tools.ietf.org/html/rfc6749#section-2.3">Section 2.3 Client Authentication</a>
  * @see <a target="_blank" href="https://tools.ietf.org/html/rfc6749#section-3.2.1">Section 3.2.1 Token Endpoint Client Authentication</a>
  */
 public class OAuth2ClientAuthenticationFilter implements WebFilter {
 	private final AuthenticationManager authenticationManager;
 	private final ServerWebExchangeMatcher exchangeMatcher;
-	private final HttpMessageConverter<OAuth2Error> errorHttpResponseConverter = new OAuth2ErrorHttpMessageConverter();
 	private AuthenticationConverter authenticationConverter;
-	private AuthenticationSuccessHandler authenticationSuccessHandler;
-	private AuthenticationFailureHandler authenticationFailureHandler;
+	private ServerAuthenticationSuccessHandler authenticationSuccessHandler;
+	private ServerAuthenticationFailureHandler authenticationFailureHandler;
 
 	/**
 	 * Constructs an {@code OAuth2ClientAuthenticationFilter} using the provided parameters.
 	 *
 	 * @param authenticationManager the {@link AuthenticationManager} used for authenticating the client
-	 * @param requestMatcher the {@link RequestMatcher} used for matching against the {@code HttpServletRequest}
+	 * @param exchangeMatcher the {@link ServerWebExchangeMatcher} used for matching against the {@code ServerWebExchange}
 	 */
 	public OAuth2ClientAuthenticationFilter(AuthenticationManager authenticationManager,
 											ServerWebExchangeMatcher exchangeMatcher) {
 		Assert.notNull(authenticationManager, "authenticationManager cannot be null");
-		Assert.notNull(exchangeMatcher, "requestMatcher cannot be null");
+		Assert.notNull(exchangeMatcher, "exchangeMatcher cannot be null");
 		this.authenticationManager = authenticationManager;
 		this.exchangeMatcher = exchangeMatcher;
 		this.authenticationConverter = new DelegatingAuthenticationConverter(
@@ -82,9 +77,9 @@ public class OAuth2ClientAuthenticationFilter implements WebFilter {
 		this.authenticationFailureHandler = this::onAuthenticationFailure;
 	}
 	/**
-	 * Sets the {@link AuthenticationConverter} used for converting a {@link HttpServletRequest} to an {@link OAuth2ClientAuthenticationToken}.
+	 * Sets the {@link AuthenticationConverter} used for converting a {@link ServerWebExchange} to an {@link Authentication}.
 	 *
-	 * @param authenticationConverter used for converting a {@link HttpServletRequest} to an {@link OAuth2ClientAuthenticationToken}
+	 * @param authenticationConverter used for converting a {@link ServerWebExchange} to an {@link Authentication}
 	 */
 	public final void setAuthenticationConverter(AuthenticationConverter authenticationConverter) {
 		Assert.notNull(authenticationConverter, "authenticationConverter cannot be null");
@@ -92,37 +87,50 @@ public class OAuth2ClientAuthenticationFilter implements WebFilter {
 	}
 
 	/**
-	 * Sets the {@link AuthenticationSuccessHandler} used for handling successful authentications.
+	 * Sets the {@link ServerAuthenticationSuccessHandler} used for handling successful authentications.
 	 *
-	 * @param authenticationSuccessHandler the {@link AuthenticationSuccessHandler} used for handling successful authentications
+	 * @param authenticationSuccessHandler the {@link ServerAuthenticationSuccessHandler} used for handling successful authentications
 	 */
-	public final void setAuthenticationSuccessHandler(AuthenticationSuccessHandler authenticationSuccessHandler) {
+	public final void setAuthenticationSuccessHandler(ServerAuthenticationSuccessHandler authenticationSuccessHandler) {
 		Assert.notNull(authenticationSuccessHandler, "authenticationSuccessHandler cannot be null");
 		this.authenticationSuccessHandler = authenticationSuccessHandler;
 	}
 
 	/**
-	 * Sets the {@link AuthenticationFailureHandler} used for handling failed authentications.
+	 * Sets the {@link ServerAuthenticationFailureHandler} used for handling failed authentications.
 	 *
-	 * @param authenticationFailureHandler the {@link AuthenticationFailureHandler} used for handling failed authentications
+	 * @param authenticationFailureHandler the {@link ServerAuthenticationFailureHandler} used for handling failed authentications
 	 */
-	public final void setAuthenticationFailureHandler(AuthenticationFailureHandler authenticationFailureHandler) {
+	public final void setAuthenticationFailureHandler(ServerAuthenticationFailureHandler authenticationFailureHandler) {
 		Assert.notNull(authenticationFailureHandler, "authenticationFailureHandler cannot be null");
 		this.authenticationFailureHandler = authenticationFailureHandler;
 	}
 
-	private void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-			Authentication authentication) {
+	@Override
+	public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
 
-		SecurityContext context = SecurityContextHolder.createEmptyContext();
-		context.setAuthentication(authentication);
-		SecurityContextHolder.setContext(context);
+		WebFilterExchange webFilterExchange = new WebFilterExchange(exchange, chain);
+
+		return this.exchangeMatcher.matches(exchange)
+				.filter(ServerWebExchangeMatcher.MatchResult::isMatch)
+				.flatMap(matchResult -> this.authenticationConverter.convert(exchange))
+				.switchIfEmpty(chain.filter(exchange).then(Mono.empty()))
+				.flatMap(token -> {
+					Authentication authenticationResult = this.authenticationManager.authenticate(token);
+					return this.authenticationSuccessHandler.onAuthenticationSuccess(webFilterExchange, authenticationResult);
+				})
+				.onErrorResume(OAuth2AuthenticationException.class, e -> this.authenticationFailureHandler
+						.onAuthenticationFailure(webFilterExchange, e));
 	}
 
-	private void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
-			AuthenticationException failed) throws IOException {
+	private Mono<Void> onAuthenticationSuccess(WebFilterExchange exchange, Authentication authentication) {
 
-		SecurityContextHolder.clearContext();
+		return Mono.empty()
+				.then()
+				.contextWrite(ReactiveSecurityContextHolder.withAuthentication(authentication));
+	}
+
+	private Mono<Void> onAuthenticationFailure(WebFilterExchange exchange, AuthenticationException failed) {
 
 		// TODO
 		// The authorization server MAY return an HTTP 401 (Unauthorized) status code
@@ -133,38 +141,18 @@ public class OAuth2ClientAuthenticationFilter implements WebFilter {
 		// matching the authentication scheme used by the client.
 
 		OAuth2Error error = ((OAuth2AuthenticationException) failed).getError();
-		ServletServerHttpResponse httpResponse = new ServletServerHttpResponse(response);
+
+		ServerHttpResponse httpResponse = exchange.getExchange().getResponse();
+
+
 		if (OAuth2ErrorCodes.INVALID_CLIENT.equals(error.getErrorCode())) {
 			httpResponse.setStatusCode(HttpStatus.UNAUTHORIZED);
 		} else {
 			httpResponse.setStatusCode(HttpStatus.BAD_REQUEST);
 		}
-		this.errorHttpResponseConverter.write(error, null, httpResponse);
+
+		DataBuffer buffer = httpResponse.bufferFactory().wrap(error.getDescription().getBytes(StandardCharsets.UTF_8));
+
+		return httpResponse.writeWith(Mono.just(buffer));
 	}
-
-	@Override
-	public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
-
-		return this.exchangeMatcher.matches(exchange)
-				.filter(ServerWebExchangeMatcher.MatchResult::isMatch)
-				.flatMap( matchResult -> this.authenticationConverter.convert(exchange))
-				.switchIfEmpty(chain.filter(exchange).then(Mono.empty()))
-				.flatMap( token -> {
-					Authentication authenticationResult = this.authenticationManager.authenticate(token);
-					this.authenticationSuccessHandler.onAuthenticationSuccess(request, response, authenticationResult);
-				});
-	}
-
-	private Mono<Void> authenticate(ServerWebExchange exchange,
-									WebFilterChain chain, Authentication token) {
-		WebFilterExchange webFilterExchange = new WebFilterExchange(exchange, chain);
-
-		return this.authenticationManagerResolver.resolve(exchange.getRequest())
-				.flatMap(authenticationManager -> authenticationManager.authenticate(token))
-				.switchIfEmpty(Mono.defer(() -> Mono.error(new IllegalStateException("No provider found for " + token.getClass()))))
-				.flatMap(authentication -> onAuthenticationSuccess(authentication, webFilterExchange))
-				.onErrorResume(AuthenticationException.class, e -> this.authenticationFailureHandler
-						.onAuthenticationFailure(webFilterExchange, e));
-	}
-
 }

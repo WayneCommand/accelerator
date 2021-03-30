@@ -1,4 +1,4 @@
-package ltd.inmind.accelerator.service;
+package ltd.inmind.accelerator.security.context;
 
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.userdetails.UserDetails;

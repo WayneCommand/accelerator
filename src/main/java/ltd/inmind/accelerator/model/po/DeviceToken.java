@@ -15,6 +15,8 @@ public class DeviceToken {
   @TableId
   private Long uId;
 
+  private String account;
+
   private String token;
 
   private String deviceId;

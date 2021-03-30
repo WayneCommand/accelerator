@@ -15,7 +15,7 @@
  */
 package ltd.inmind.accelerator.security.oauth2.server.authorization.authentication;
 
-import ltd.inmind.accelerator.security.oauth2.jwt.JwtEncoder;
+import ltd.inmind.accelerator.security.JwtEncoder;
 import ltd.inmind.accelerator.security.oauth2.server.authorization.OAuth2Authorization;
 import ltd.inmind.accelerator.security.oauth2.server.authorization.OAuth2AuthorizationAttributeNames;
 import ltd.inmind.accelerator.security.oauth2.server.authorization.OAuth2AuthorizationService;
@@ -69,7 +69,6 @@ public class OAuth2AuthorizationCodeAuthenticationProvider implements Authentica
 	 */
 	public OAuth2AuthorizationCodeAuthenticationProvider(OAuth2AuthorizationService authorizationService, JwtEncoder jwtEncoder) {
 		Assert.notNull(authorizationService, "authorizationService cannot be null");
-		Assert.notNull(jwtEncoder, "jwtEncoder cannot be null");
 		this.authorizationService = authorizationService;
 		this.jwtEncoder = jwtEncoder;
 	}

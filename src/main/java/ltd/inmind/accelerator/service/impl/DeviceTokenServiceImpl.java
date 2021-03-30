@@ -4,8 +4,10 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
 import ltd.inmind.accelerator.mapper.DeviceTokenMapper;
 import ltd.inmind.accelerator.model.po.DeviceToken;
+import ltd.inmind.accelerator.security.events.TokenRemoveEvent;
 import ltd.inmind.accelerator.service.IDeviceTokenService;
-import ltd.inmind.accelerator.service.IJwtTokenSecurityContext;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -13,11 +15,11 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Service
-public class DeviceTokenServiceImpl implements IDeviceTokenService {
+public class DeviceTokenServiceImpl implements IDeviceTokenService,ApplicationEventPublisherAware {
 
     private final DeviceTokenMapper deviceTokenMapper;
 
-    private final IJwtTokenSecurityContext jwtTokenSecurityContext;
+    private ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     public void saveDeviceToken(DeviceToken device) {
@@ -105,7 +107,7 @@ public class DeviceTokenServiceImpl implements IDeviceTokenService {
 
         //一并把token也处理掉
         String token = _deviceToken.getToken();
-        jwtTokenSecurityContext.remove(token);
+        applicationEventPublisher.publishEvent(new TokenRemoveEvent(token));
     }
 
     @Override
@@ -118,4 +120,8 @@ public class DeviceTokenServiceImpl implements IDeviceTokenService {
                 .eq(DeviceToken::getUId, deviceToken.getUId()));
     }
 
+    @Override
+    public void setApplicationEventPublisher(ApplicationEventPublisher _applicationEventPublisher) {
+        this.applicationEventPublisher = _applicationEventPublisher;
+    }
 }

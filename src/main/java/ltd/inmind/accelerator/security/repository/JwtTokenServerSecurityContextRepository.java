@@ -1,8 +1,8 @@
 package ltd.inmind.accelerator.security.repository;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import ltd.inmind.accelerator.service.IJwtTokenSecurityContext;
+import ltd.inmind.accelerator.security.context.IJwtTokenSecurityContext;
+import ltd.inmind.accelerator.security.context.JwtTokenSecurityContext;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
@@ -12,12 +12,11 @@ import reactor.core.publisher.Mono;
 
 import static ltd.inmind.accelerator.constants.SecurityConst.AUTHENTICATION_HEADER;
 import static ltd.inmind.accelerator.constants.SecurityConst.TOKEN_ATTR_NAME;
-@RequiredArgsConstructor
+
 @Slf4j
-@Component
 public class JwtTokenServerSecurityContextRepository implements ServerSecurityContextRepository {
 
-    private final IJwtTokenSecurityContext jwtTokenSecurityContext;
+    private final IJwtTokenSecurityContext jwtTokenSecurityContext = new JwtTokenSecurityContext();
 
     @Override
     public Mono<Void> save(ServerWebExchange exchange, SecurityContext context) {
@@ -52,5 +51,4 @@ public class JwtTokenServerSecurityContextRepository implements ServerSecurityCo
 
         return Mono.justOrEmpty(jwtTokenSecurityContext.load(token));
     }
-
 }

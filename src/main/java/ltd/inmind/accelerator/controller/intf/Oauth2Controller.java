@@ -21,7 +21,6 @@ public class Oauth2Controller {
      * @param client_id 客户端ID
      * @param redirect_uri 重定向路径(不是必须的)
      * @param scope 权限范围
-     * @return
      */
     @GetMapping("/authorize")
     public String authorize(String client_id, String response_type, String redirect_uri, String scope) {

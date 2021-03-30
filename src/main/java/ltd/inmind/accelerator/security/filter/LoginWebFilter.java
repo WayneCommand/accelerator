@@ -1,5 +1,12 @@
 package ltd.inmind.accelerator.security.filter;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import ltd.inmind.accelerator.model.vo.DataResponse;
+import ltd.inmind.accelerator.security.handler.AuthenticationFailureHandler;
+import ltd.inmind.accelerator.security.handler.AuthenticationSuccessHandler;
+import ltd.inmind.accelerator.security.repository.JwtTokenServerSecurityContextRepository;
+import ltd.inmind.accelerator.serializer.DataResponseSerializer;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
@@ -21,33 +28,36 @@ import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 
-public class JwtAuthWebFilter implements WebFilter {
+/**
+ * 负责 登录操作
+ * 签发 JWT Token
+ */
+public class LoginWebFilter implements WebFilter {
 
     private final ServerWebExchangeMatcher matcher = ServerWebExchangeMatchers
             .pathMatchers(HttpMethod.POST, "/login");
 
     private final ReactiveAuthenticationManagerResolver<ServerHttpRequest> authenticationManagerResolver;
 
-    //想办法怎么从spring security里拿出来
-    private final ServerSecurityContextRepository securityContextRepository;
+    private final ServerSecurityContextRepository securityContextRepository = new JwtTokenServerSecurityContextRepository();
 
-    private final ServerAuthenticationSuccessHandler authenticationSuccessHandler;
+    // TODO Spring DI
+    private final Gson gson = new GsonBuilder()
+            .registerTypeAdapter(DataResponse.class, new DataResponseSerializer())
+            .create();
 
-    private final ServerAuthenticationFailureHandler authenticationFailureHandler;
+    private final ServerAuthenticationSuccessHandler authenticationSuccessHandler = new AuthenticationSuccessHandler(gson);
+
+    private final ServerAuthenticationFailureHandler authenticationFailureHandler = new AuthenticationFailureHandler(gson);
 
 
     private final String usernameParameter = "username";
 
     private final String passwordParameter = "password";
 
-    public JwtAuthWebFilter(ReactiveAuthenticationManager authenticationManager, ServerSecurityContextRepository serverSecurityContextRepository,
-                            ServerAuthenticationSuccessHandler serverAuthenticationSuccessHandler, ServerAuthenticationFailureHandler serverAuthenticationFailureHandler) {
+    public LoginWebFilter(ReactiveAuthenticationManager authenticationManager) {
 
         this.authenticationManagerResolver = request -> Mono.just(authenticationManager);
-        this.securityContextRepository = serverSecurityContextRepository;
-
-        this.authenticationSuccessHandler = serverAuthenticationSuccessHandler;
-        this.authenticationFailureHandler = serverAuthenticationFailureHandler;
     }
 
     /**

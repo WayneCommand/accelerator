@@ -1,6 +1,5 @@
-package ltd.inmind.accelerator.service.impl;
+package ltd.inmind.accelerator.security.context;
 
-import ltd.inmind.accelerator.service.IJwtTokenSecurityContext;
 import ltd.inmind.accelerator.utils.JwtUtil;
 import ltd.inmind.accelerator.utils.UUIDUtil;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

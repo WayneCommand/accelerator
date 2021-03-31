@@ -15,7 +15,6 @@
  */
 package ltd.inmind.accelerator.security.oauth2.server.authorization.authentication;
 
-import ltd.inmind.accelerator.security.JwtEncoder;
 import ltd.inmind.accelerator.security.oauth2.server.authorization.OAuth2Authorization;
 import ltd.inmind.accelerator.security.oauth2.server.authorization.OAuth2AuthorizationAttributeNames;
 import ltd.inmind.accelerator.security.oauth2.server.authorization.OAuth2AuthorizationService;
@@ -53,24 +52,20 @@ import static ltd.inmind.accelerator.security.oauth2.server.authorization.authen
  * @see OAuth2AuthorizationCodeAuthenticationToken
  * @see OAuth2AccessTokenAuthenticationToken
  * @see OAuth2AuthorizationService
- * @see JwtEncoder
  * @see <a target="_blank" href="https://tools.ietf.org/html/rfc6749#section-4.1">Section 4.1 Authorization Code Grant</a>
  * @see <a target="_blank" href="https://tools.ietf.org/html/rfc6749#section-4.1.3">Section 4.1.3 Access Token Request</a>
  */
 public class OAuth2AuthorizationCodeAuthenticationProvider implements AuthenticationProvider {
 	private final OAuth2AuthorizationService authorizationService;
-	private final JwtEncoder jwtEncoder;
 
 	/**
 	 * Constructs an {@code OAuth2AuthorizationCodeAuthenticationProvider} using the provided parameters.
 	 *
 	 * @param authorizationService the authorization service
-	 * @param jwtEncoder the jwt encoder
 	 */
-	public OAuth2AuthorizationCodeAuthenticationProvider(OAuth2AuthorizationService authorizationService, JwtEncoder jwtEncoder) {
+	public OAuth2AuthorizationCodeAuthenticationProvider(OAuth2AuthorizationService authorizationService) {
 		Assert.notNull(authorizationService, "authorizationService cannot be null");
 		this.authorizationService = authorizationService;
-		this.jwtEncoder = jwtEncoder;
 	}
 
 	@Override
@@ -112,9 +107,10 @@ public class OAuth2AuthorizationCodeAuthenticationProvider implements Authentica
 		}
 
 		Set<String> authorizedScopes = authorization.getAttribute(OAuth2AuthorizationAttributeNames.AUTHORIZED_SCOPES);
-		Jwt jwt = OAuth2TokenIssuerUtil.issueJwtAccessToken(
+		/*Jwt jwt = OAuth2TokenIssuerUtil.issueJwtAccessToken(
 				this.jwtEncoder, authorization.getPrincipalName(), registeredClient.getClientId(),
-				authorizedScopes, registeredClient.getTokenSettings().accessTokenTimeToLive());
+				authorizedScopes, registeredClient.getTokenSettings().accessTokenTimeToLive());*/
+		Jwt jwt = null;
 		OAuth2AccessToken accessToken = new OAuth2AccessToken(OAuth2AccessToken.TokenType.BEARER,
 				jwt.getTokenValue(), jwt.getIssuedAt(), jwt.getExpiresAt(), authorizedScopes);
 
@@ -123,15 +119,18 @@ public class OAuth2AuthorizationCodeAuthenticationProvider implements Authentica
 
 		OAuth2RefreshToken refreshToken = null;
 		if (registeredClient.getAuthorizationGrantTypes().contains(AuthorizationGrantType.REFRESH_TOKEN)) {
-			refreshToken = OAuth2TokenIssuerUtil.issueRefreshToken(registeredClient.getTokenSettings().refreshTokenTimeToLive());
+			//refreshToken = OAuth2TokenIssuerUtil.issueRefreshToken(registeredClient.getTokenSettings().refreshTokenTimeToLive());
 			tokensBuilder.refreshToken(refreshToken);
 		}
 
 		OidcIdToken idToken = null;
 		if (authorizationRequest.getScopes().contains(OidcScopes.OPENID)) {
-			Jwt jwtIdToken = OAuth2TokenIssuerUtil.issueIdToken(
+			/*Jwt jwtIdToken = OAuth2TokenIssuerUtil.issueIdToken(
 					this.jwtEncoder, authorization.getPrincipalName(), registeredClient.getClientId(),
-					(String) authorizationRequest.getAdditionalParameters().get(OidcParameterNames.NONCE));
+					(String) authorizationRequest.getAdditionalParameters().get(OidcParameterNames.NONCE));*/
+
+			Jwt jwtIdToken = null;
+
 			idToken = new OidcIdToken(jwtIdToken.getTokenValue(), jwtIdToken.getIssuedAt(),
 					jwtIdToken.getExpiresAt(), jwtIdToken.getClaims());
 			tokensBuilder.token(idToken);

@@ -16,8 +16,6 @@
 package ltd.inmind.accelerator.security.oauth2.server.authorization.client;
 
 import ltd.inmind.accelerator.security.oauth2.server.authorization.Version;
-import ltd.inmind.accelerator.security.oauth2.server.authorization.config.ClientSettings;
-import ltd.inmind.accelerator.security.oauth2.server.authorization.config.TokenSettings;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.util.Assert;
@@ -48,9 +46,6 @@ public class RegisteredClient implements Serializable {
 	private Set<AuthorizationGrantType> authorizationGrantTypes;
 	private Set<String> redirectUris;
 	private Set<String> scopes;
-	private ClientSettings clientSettings;
-	private TokenSettings tokenSettings;
-
 	protected RegisteredClient() {
 	}
 
@@ -118,24 +113,6 @@ public class RegisteredClient implements Serializable {
 		return this.scopes;
 	}
 
-	/**
-	 * Returns the {@link ClientSettings client configuration settings}.
-	 *
-	 * @return the {@link ClientSettings}
-	 */
-	public ClientSettings getClientSettings() {
-		return this.clientSettings;
-	}
-
-	/**
-	 * Returns the {@link TokenSettings token configuration settings}.
-	 *
-	 * @return the {@link TokenSettings}
-	 */
-	public TokenSettings getTokenSettings() {
-		return this.tokenSettings;
-	}
-
 	@Override
 	public String toString() {
 		return "RegisteredClient{" +
@@ -182,8 +159,6 @@ public class RegisteredClient implements Serializable {
 		private Set<AuthorizationGrantType> authorizationGrantTypes = new LinkedHashSet<>();
 		private Set<String> redirectUris = new LinkedHashSet<>();
 		private Set<String> scopes = new LinkedHashSet<>();
-		private ClientSettings clientSettings = new ClientSettings();
-		private TokenSettings tokenSettings = new TokenSettings();
 
 		protected Builder(String id) {
 			this.id = id;
@@ -205,8 +180,6 @@ public class RegisteredClient implements Serializable {
 			if (!CollectionUtils.isEmpty(registeredClient.scopes)) {
 				this.scopes.addAll(registeredClient.scopes);
 			}
-			this.clientSettings = new ClientSettings(registeredClient.clientSettings.settings());
-			this.tokenSettings = new TokenSettings(registeredClient.tokenSettings.settings());
 		}
 
 		/**
@@ -337,30 +310,6 @@ public class RegisteredClient implements Serializable {
 		}
 
 		/**
-		 * A {@link Consumer} of the client configuration settings,
-		 * allowing the ability to add, replace, or remove.
-		 *
-		 * @param clientSettingsConsumer a {@link Consumer} of the client configuration settings
-		 * @return the {@link Builder}
-		 */
-		public Builder clientSettings(Consumer<ClientSettings> clientSettingsConsumer) {
-			clientSettingsConsumer.accept(this.clientSettings);
-			return this;
-		}
-
-		/**
-		 * A {@link Consumer} of the token configuration settings,
-		 * allowing the ability to add, replace, or remove.
-		 *
-		 * @param tokenSettingsConsumer a {@link Consumer} of the token configuration settings
-		 * @return the {@link Builder}
-		 */
-		public Builder tokenSettings(Consumer<TokenSettings> tokenSettingsConsumer) {
-			tokenSettingsConsumer.accept(this.tokenSettings);
-			return this;
-		}
-
-		/**
 		 * Builds a new {@link RegisteredClient}.
 		 *
 		 * @return a {@link RegisteredClient}
@@ -390,8 +339,6 @@ public class RegisteredClient implements Serializable {
 			registeredClient.authorizationGrantTypes = Collections.unmodifiableSet(this.authorizationGrantTypes);
 			registeredClient.redirectUris = Collections.unmodifiableSet(this.redirectUris);
 			registeredClient.scopes = Collections.unmodifiableSet(this.scopes);
-			registeredClient.clientSettings = this.clientSettings;
-			registeredClient.tokenSettings = this.tokenSettings;
 
 			return registeredClient;
 		}

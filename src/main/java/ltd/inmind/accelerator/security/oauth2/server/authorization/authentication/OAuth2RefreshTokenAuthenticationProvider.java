@@ -15,13 +15,11 @@
  */
 package ltd.inmind.accelerator.security.oauth2.server.authorization.authentication;
 
-import ltd.inmind.accelerator.security.oauth2.jwt.JwtEncoder;
 import ltd.inmind.accelerator.security.oauth2.server.authorization.OAuth2Authorization;
 import ltd.inmind.accelerator.security.oauth2.server.authorization.OAuth2AuthorizationAttributeNames;
 import ltd.inmind.accelerator.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import ltd.inmind.accelerator.security.oauth2.server.authorization.TokenType;
 import ltd.inmind.accelerator.security.oauth2.server.authorization.client.RegisteredClient;
-import ltd.inmind.accelerator.security.oauth2.server.authorization.config.TokenSettings;
 import ltd.inmind.accelerator.security.oauth2.server.authorization.token.OAuth2TokenMetadata;
 import ltd.inmind.accelerator.security.oauth2.server.authorization.token.OAuth2Tokens;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -45,26 +43,20 @@ import static ltd.inmind.accelerator.security.oauth2.server.authorization.authen
  * @see OAuth2RefreshTokenAuthenticationToken
  * @see OAuth2AccessTokenAuthenticationToken
  * @see OAuth2AuthorizationService
- * @see JwtEncoder
  * @see <a target="_blank" href="https://tools.ietf.org/html/rfc6749#section-1.5">Section 1.5 Refresh Token Grant</a>
  * @see <a target="_blank" href="https://tools.ietf.org/html/rfc6749#section-6">Section 6 Refreshing an Access Token</a>
  */
 public class OAuth2RefreshTokenAuthenticationProvider implements AuthenticationProvider {
 	private final OAuth2AuthorizationService authorizationService;
-	private final JwtEncoder jwtEncoder;
 
 	/**
 	 * Constructs an {@code OAuth2RefreshTokenAuthenticationProvider} using the provided parameters.
 	 *
 	 * @param authorizationService the authorization service
-	 * @param jwtEncoder the jwt encoder
 	 */
-	public OAuth2RefreshTokenAuthenticationProvider(OAuth2AuthorizationService authorizationService,
-			JwtEncoder jwtEncoder) {
+	public OAuth2RefreshTokenAuthenticationProvider(OAuth2AuthorizationService authorizationService) {
 		Assert.notNull(authorizationService, "authorizationService cannot be null");
-		Assert.notNull(jwtEncoder, "jwtEncoder cannot be null");
 		this.authorizationService = authorizationService;
-		this.jwtEncoder = jwtEncoder;
 	}
 
 	@Override
@@ -117,16 +109,14 @@ public class OAuth2RefreshTokenAuthenticationProvider implements AuthenticationP
 			throw new OAuth2AuthenticationException(new OAuth2Error(OAuth2ErrorCodes.INVALID_GRANT));
 		}
 
-		Jwt jwt = OAuth2TokenIssuerUtil
+		/*Jwt jwt = OAuth2TokenIssuerUtil
 			.issueJwtAccessToken(this.jwtEncoder, authorization.getPrincipalName(), registeredClient.getClientId(), scopes, registeredClient.getTokenSettings().accessTokenTimeToLive());
 		OAuth2AccessToken accessToken = new OAuth2AccessToken(OAuth2AccessToken.TokenType.BEARER,
-			jwt.getTokenValue(), jwt.getIssuedAt(), jwt.getExpiresAt(), scopes);
+			jwt.getTokenValue(), jwt.getIssuedAt(), jwt.getExpiresAt(), scopes);*/
 
-		TokenSettings tokenSettings = registeredClient.getTokenSettings();
+		Jwt jwt = null;
 
-		if (!tokenSettings.reuseRefreshTokens()) {
-			refreshToken = OAuth2TokenIssuerUtil.issueRefreshToken(tokenSettings.refreshTokenTimeToLive());
-		}
+		OAuth2AccessToken accessToken = null;
 
 		authorization = OAuth2Authorization.from(authorization)
 				.tokens(OAuth2Tokens.from(authorization.getTokens()).accessToken(accessToken).refreshToken(refreshToken).build())

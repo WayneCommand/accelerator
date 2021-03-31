@@ -19,12 +19,9 @@ import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
-import ltd.inmind.accelerator.security.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
-import ltd.inmind.accelerator.security.jose.Jwks;
 import ltd.inmind.accelerator.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
 import ltd.inmind.accelerator.security.oauth2.server.authorization.client.RegisteredClient;
 import ltd.inmind.accelerator.security.oauth2.server.authorization.client.RegisteredClientRepository;
-import ltd.inmind.accelerator.security.oauth2.server.authorization.config.ProviderSettings;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -39,7 +36,7 @@ import java.util.UUID;
  * @since 0.0.1
  */
 @Configuration(proxyBeanMethods = false)
-@Import(OAuth2AuthorizationServerConfiguration.class)
+//@Import(OAuth2AuthorizationServerConfiguration.class)
 public class AuthorizationServerConfig {
 
 	// @formatter:off
@@ -57,22 +54,11 @@ public class AuthorizationServerConfig {
 				.scope(OidcScopes.OPENID)
 				.scope("message.read")
 				.scope("message.write")
-				.clientSettings(clientSettings -> clientSettings.requireUserConsent(true))
+				// .clientSettings(clientSettings -> clientSettings.requireUserConsent(true))
 				.build();
 
 		return new InMemoryRegisteredClientRepository(registeredClient);
 	}
 	// @formatter:on
 
-	@Bean
-	public JWKSource<SecurityContext> jwkSource() {
-		RSAKey rsaKey = Jwks.generateRsa();
-		JWKSet jwkSet = new JWKSet(rsaKey);
-		return (jwkSelector, securityContext) -> jwkSelector.select(jwkSet);
-	}
-
-	@Bean
-	public ProviderSettings providerSettings() {
-		return new ProviderSettings().issuer("http://auth-service:9000");
-	}
 }

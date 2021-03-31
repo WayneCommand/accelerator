@@ -51,7 +51,11 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.server.WebFilter;
+import org.springframework.web.server.WebFilterChain;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -79,13 +83,11 @@ import java.util.Set;
  * @see <a target="_blank" href="https://tools.ietf.org/html/rfc6749#section-4.1.1">Section 4.1.1 Authorization Request</a>
  * @see <a target="_blank" href="https://tools.ietf.org/html/rfc6749#section-4.1.2">Section 4.1.2 Authorization Response</a>
  */
-public class OAuth2AuthorizationEndpointFilter extends OncePerRequestFilter {
+public class OAuth2AuthorizationEndpointFilter implements WebFilter {
 	/**
 	 * The default endpoint {@code URI} for authorization requests.
 	 */
 	public static final String DEFAULT_AUTHORIZATION_ENDPOINT_URI = "/oauth2/authorize";
-
-	private static final String PKCE_ERROR_URI = "https://tools.ietf.org/html/rfc7636#section-4.4.1";
 
 	private final RegisteredClientRepository registeredClientRepository;
 	private final OAuth2AuthorizationService authorizationService;
@@ -125,21 +127,19 @@ public class OAuth2AuthorizationEndpointFilter extends OncePerRequestFilter {
 				authorizationEndpointUri, HttpMethod.GET.name());
 		RequestMatcher authorizationRequestPostMatcher = new AntPathRequestMatcher(
 				authorizationEndpointUri, HttpMethod.POST.name());
-		RequestMatcher openidScopeMatcher = request -> {
-			String scope = request.getParameter(OAuth2ParameterNames.SCOPE);
-			return StringUtils.hasText(scope) && scope.contains(OidcScopes.OPENID);
-		};
-		RequestMatcher consentActionMatcher = request ->
-				request.getParameter(UserConsentPage.CONSENT_ACTION_PARAMETER_NAME) != null;
+		/*RequestMatcher consentActionMatcher = request ->
+				request.getParameter(UserConsentPage.CONSENT_ACTION_PARAMETER_NAME) != null;*/
+		RequestMatcher consentActionMatcher = null;
 		this.authorizationRequestMatcher = new OrRequestMatcher(
 				authorizationRequestGetMatcher,
 				new AndRequestMatcher(
-						authorizationRequestPostMatcher, openidScopeMatcher,
+						authorizationRequestPostMatcher,
 						new NegatedRequestMatcher(consentActionMatcher)));
 		this.userConsentMatcher = new AndRequestMatcher(
 				authorizationRequestPostMatcher, consentActionMatcher);
 	}
 
+/*
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
@@ -152,7 +152,8 @@ public class OAuth2AuthorizationEndpointFilter extends OncePerRequestFilter {
 			filterChain.doFilter(request, response);
 		}
 	}
-
+	*/
+/*
 	private void processAuthorizationRequest(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
 
@@ -224,7 +225,8 @@ public class OAuth2AuthorizationEndpointFilter extends OncePerRequestFilter {
 					authorizationRequestContext.resolveRedirectUri(), authorizationCode, authorizationRequest.getState());
 		}
 	}
-
+	*/
+/*
 	private void processUserConsent(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
 
@@ -269,7 +271,8 @@ public class OAuth2AuthorizationEndpointFilter extends OncePerRequestFilter {
 		sendAuthorizationResponse(request, response, userConsentRequestContext.resolveRedirectUri(),
 				authorizationCode, userConsentRequestContext.getAuthorizationRequest().getState());
 	}
-
+	*/
+/*
 	private void validateAuthorizationRequest(OAuth2AuthorizationRequestContext authorizationRequestContext) {
 		// ---------------
 		// Validate the request to ensure all required parameters are present and valid
@@ -356,6 +359,7 @@ public class OAuth2AuthorizationEndpointFilter extends OncePerRequestFilter {
 			return;
 		}
 	}
+*/
 
 	private void validateUserConsentRequest(UserConsentRequestContext userConsentRequestContext) {
 		// ---------------
@@ -412,6 +416,7 @@ public class OAuth2AuthorizationEndpointFilter extends OncePerRequestFilter {
 			return;
 		}
 	}
+/*
 
 	private void sendAuthorizationResponse(HttpServletRequest request, HttpServletResponse response,
 			String redirectUri, OAuth2AuthorizationCode authorizationCode, String state) throws IOException {
@@ -424,7 +429,9 @@ public class OAuth2AuthorizationEndpointFilter extends OncePerRequestFilter {
 		}
 		this.redirectStrategy.sendRedirect(request, response, uriBuilder.toUriString());
 	}
+*/
 
+	/*
 	private void sendErrorResponse(HttpServletRequest request, HttpServletResponse response,
 			String redirectUri, OAuth2Error error, String state) throws IOException {
 
@@ -442,11 +449,7 @@ public class OAuth2AuthorizationEndpointFilter extends OncePerRequestFilter {
 		}
 		this.redirectStrategy.sendRedirect(request, response, uriBuilder.toUriString());
 	}
-
-	private void sendErrorResponse(HttpServletResponse response, OAuth2Error error) throws IOException {
-		// TODO Send default html error response
-		response.sendError(HttpStatus.BAD_REQUEST.value(), error.toString());
-	}
+	*/
 
 	private static OAuth2Error createError(String errorCode, String parameterName) {
 		return createError(errorCode, parameterName, "https://tools.ietf.org/html/rfc6749#section-4.1.2.1");
@@ -460,6 +463,11 @@ public class OAuth2AuthorizationEndpointFilter extends OncePerRequestFilter {
 		return principal != null &&
 				!AnonymousAuthenticationToken.class.isAssignableFrom(principal.getClass()) &&
 				principal.isAuthenticated();
+	}
+
+	@Override
+	public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
+		return null;
 	}
 
 	private static class OAuth2AuthorizationRequestContext extends AbstractRequestContext {
@@ -626,6 +634,7 @@ public class OAuth2AuthorizationEndpointFilter extends OncePerRequestFilter {
 		protected abstract String resolveRedirectUri();
 	}
 
+	/*
 	private static class UserConsentPage {
 		private static final MediaType TEXT_HTML_UTF8 = new MediaType("text", "html", StandardCharsets.UTF_8);
 		private static final String CONSENT_ACTION_PARAMETER_NAME = "consent_action";
@@ -716,4 +725,5 @@ public class OAuth2AuthorizationEndpointFilter extends OncePerRequestFilter {
 			return builder.toString();
 		}
 	}
+	*/
 }

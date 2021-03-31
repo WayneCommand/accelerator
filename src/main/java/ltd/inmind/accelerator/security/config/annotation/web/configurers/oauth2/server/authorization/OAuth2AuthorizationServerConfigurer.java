@@ -18,7 +18,6 @@ package ltd.inmind.accelerator.security.config.annotation.web.configurers.oauth2
 import ltd.inmind.accelerator.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import ltd.inmind.accelerator.security.oauth2.server.authorization.authentication.*;
 import ltd.inmind.accelerator.security.oauth2.server.authorization.client.RegisteredClientRepository;
-import ltd.inmind.accelerator.security.oauth2.server.authorization.oidc.web.OidcProviderConfigurationEndpointFilter;
 import ltd.inmind.accelerator.security.oauth2.server.authorization.web.*;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -56,10 +55,6 @@ public final class OAuth2AuthorizationServerConfigurer {
 			OAuth2TokenEndpointFilter.DEFAULT_TOKEN_ENDPOINT_URI, HttpMethod.POST.name());
 	private final RequestMatcher tokenRevocationEndpointMatcher = new AntPathRequestMatcher(
 			OAuth2TokenRevocationEndpointFilter.DEFAULT_TOKEN_REVOCATION_ENDPOINT_URI, HttpMethod.POST.name());
-	private final RequestMatcher jwkSetEndpointMatcher = new AntPathRequestMatcher(
-			NimbusJwkSetEndpointFilter.DEFAULT_JWK_SET_ENDPOINT_URI, HttpMethod.GET.name());
-	private final RequestMatcher oidcProviderConfigurationEndpointMatcher = new AntPathRequestMatcher(
-			OidcProviderConfigurationEndpointFilter.DEFAULT_OIDC_PROVIDER_CONFIGURATION_ENDPOINT_URI, HttpMethod.GET.name());
 
 	/**
 	 * Sets the repository of registered clients.
@@ -100,8 +95,7 @@ public final class OAuth2AuthorizationServerConfigurer {
 	public List<RequestMatcher> getEndpointMatchers() {
 		// TODO Initialize matchers using URI's from ProviderSettings
 		return Arrays.asList(this.authorizationEndpointMatcher, this.tokenEndpointMatcher,
-				this.tokenRevocationEndpointMatcher, this.jwkSetEndpointMatcher,
-				this.oidcProviderConfigurationEndpointMatcher);
+				this.tokenRevocationEndpointMatcher);
 	}
 
 	public void init() {
@@ -111,13 +105,13 @@ public final class OAuth2AuthorizationServerConfigurer {
 
 
 		OAuth2AuthorizationCodeAuthenticationProvider authorizationCodeAuthenticationProvider =
-				new OAuth2AuthorizationCodeAuthenticationProvider(null,null);
+				new OAuth2AuthorizationCodeAuthenticationProvider(null);
 
 		OAuth2RefreshTokenAuthenticationProvider refreshTokenAuthenticationProvider =
-				new OAuth2RefreshTokenAuthenticationProvider(null, null);
+				new OAuth2RefreshTokenAuthenticationProvider(null);
 
 		OAuth2ClientCredentialsAuthenticationProvider clientCredentialsAuthenticationProvider =
-				new OAuth2ClientCredentialsAuthenticationProvider(null, null);
+				new OAuth2ClientCredentialsAuthenticationProvider(null);
 
 		OAuth2TokenRevocationAuthenticationProvider tokenRevocationAuthenticationProvider =
 				new OAuth2TokenRevocationAuthenticationProvider(null);

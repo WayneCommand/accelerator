@@ -1,6 +1,7 @@
 package ltd.inmind.accelerator.security.context;
 
-import ltd.inmind.accelerator.utils.JwtUtil;
+import ltd.inmind.accelerator.constants.SecurityConst;
+import ltd.inmind.accelerator.security.Jwt;
 import ltd.inmind.accelerator.utils.UUIDUtil;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -10,8 +11,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
@@ -30,7 +33,9 @@ public class JwtTokenSecurityContext implements IJwtTokenSecurityContext {
         //最简版本
         //生成jwt token
         String secret = UUIDUtil.generateShortUuid();
-        String token = JwtUtil.sign(account, secret);
+
+        Jwt jwt = Jwt.create(Collections.singletonMap(SecurityConst.TOKEN_USER_KEY, account), secret);
+        String token = jwt.getJwt();
 
         //缓存这个context
         cache.put(token, securityContext);
@@ -46,10 +51,10 @@ public class JwtTokenSecurityContext implements IJwtTokenSecurityContext {
             return null;
 
         //先进行校验
-        boolean verify = JwtUtil.verify(token, getUsername(token), tokenSecrets.get(token));
+        Jwt jwt = Jwt.from(token, tokenSecrets.get(token));
 
         //如果通过 把context从缓存里拿出来
-        if (verify){
+        if (Objects.nonNull(jwt)) {
             return cache.get(token);
         }
 
@@ -67,10 +72,6 @@ public class JwtTokenSecurityContext implements IJwtTokenSecurityContext {
         return createAuthentication(userDetailsMono)
                 .map(SecurityContextImpl::new)
                 .map(this::save);
-    }
-
-    private String getUsername(String token) {
-        return JwtUtil.getClaim(token, JwtUtil.JWT_USERNAME);
     }
 
     private Mono<Authentication> createAuthentication(Mono<UserDetails> userDetailsMono){

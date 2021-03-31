@@ -15,7 +15,6 @@
  */
 package ltd.inmind.accelerator.security.oauth2.server.authorization.authentication;
 
-import ltd.inmind.accelerator.security.oauth2.jwt.JwtEncoder;
 import ltd.inmind.accelerator.security.oauth2.server.authorization.OAuth2Authorization;
 import ltd.inmind.accelerator.security.oauth2.server.authorization.OAuth2AuthorizationAttributeNames;
 import ltd.inmind.accelerator.security.oauth2.server.authorization.OAuth2AuthorizationService;
@@ -43,26 +42,20 @@ import static ltd.inmind.accelerator.security.oauth2.server.authorization.authen
  * @see OAuth2ClientCredentialsAuthenticationToken
  * @see OAuth2AccessTokenAuthenticationToken
  * @see OAuth2AuthorizationService
- * @see JwtEncoder
  * @see <a target="_blank" href="https://tools.ietf.org/html/rfc6749#section-4.4">Section 4.4 Client Credentials Grant</a>
  * @see <a target="_blank" href="https://tools.ietf.org/html/rfc6749#section-4.4.2">Section 4.4.2 Access Token Request</a>
  */
 public class OAuth2ClientCredentialsAuthenticationProvider implements AuthenticationProvider {
 	private final OAuth2AuthorizationService authorizationService;
-	private final JwtEncoder jwtEncoder;
 
 	/**
 	 * Constructs an {@code OAuth2ClientCredentialsAuthenticationProvider} using the provided parameters.
 	 *
 	 * @param authorizationService the authorization service
-	 * @param jwtEncoder the jwt encoder
 	 */
-	public OAuth2ClientCredentialsAuthenticationProvider(OAuth2AuthorizationService authorizationService,
-			JwtEncoder jwtEncoder) {
+	public OAuth2ClientCredentialsAuthenticationProvider(OAuth2AuthorizationService authorizationService) {
 		Assert.notNull(authorizationService, "authorizationService cannot be null");
-		Assert.notNull(jwtEncoder, "jwtEncoder cannot be null");
 		this.authorizationService = authorizationService;
-		this.jwtEncoder = jwtEncoder;
 	}
 
 	@Override
@@ -89,10 +82,12 @@ public class OAuth2ClientCredentialsAuthenticationProvider implements Authentica
 			scopes = new LinkedHashSet<>(clientCredentialsAuthentication.getScopes());
 		}
 
-		Jwt jwt = OAuth2TokenIssuerUtil
+		/*Jwt jwt = OAuth2TokenIssuerUtil
 			.issueJwtAccessToken(this.jwtEncoder, clientPrincipal.getName(), registeredClient.getClientId(), scopes, registeredClient.getTokenSettings().accessTokenTimeToLive());
 		OAuth2AccessToken accessToken = new OAuth2AccessToken(OAuth2AccessToken.TokenType.BEARER,
-				jwt.getTokenValue(), jwt.getIssuedAt(), jwt.getExpiresAt(), scopes);
+				jwt.getTokenValue(), jwt.getIssuedAt(), jwt.getExpiresAt(), scopes);*/
+		Jwt jwt = null;
+		OAuth2AccessToken accessToken = null;
 
 		OAuth2Authorization authorization = OAuth2Authorization.withRegisteredClient(registeredClient)
 				.principalName(clientPrincipal.getName())

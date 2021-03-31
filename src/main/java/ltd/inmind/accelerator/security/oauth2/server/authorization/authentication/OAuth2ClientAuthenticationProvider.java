@@ -132,8 +132,7 @@ public class OAuth2ClientAuthenticationProvider implements AuthenticationProvide
 
 		String codeChallenge = (String) authorizationRequest.getAdditionalParameters()
 				.get(PkceParameterNames.CODE_CHALLENGE);
-		if (!StringUtils.hasText(codeChallenge) &&
-				registeredClient.getClientSettings().requireProofKey()) {
+		if (!StringUtils.hasText(codeChallenge)) {
 			throwInvalidClient();
 		}
 

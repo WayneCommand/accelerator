@@ -6,8 +6,6 @@ import ltd.inmind.accelerator.model.vo.MyHomePage;
 import ltd.inmind.accelerator.model.vo.MyInfo;
 import ltd.inmind.accelerator.model.vo.MySafety;
 import ltd.inmind.accelerator.model.vo.VerifyCode;
-import reactor.core.publisher.Mono;
-
 import java.util.List;
 
 public interface IUserService {
@@ -53,6 +51,4 @@ public interface IUserService {
     Boolean testVerifyCode(VerifyCode verifyCode, String account, String businessLine);
 
     void updateUserAccount(UserAccount userAccount);
-
-    Mono<String> refreshToken(String username);
 }

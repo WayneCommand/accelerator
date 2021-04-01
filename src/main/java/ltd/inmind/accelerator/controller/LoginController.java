@@ -2,7 +2,6 @@ package ltd.inmind.accelerator.controller;
 
 import lombok.RequiredArgsConstructor;
 import ltd.inmind.accelerator.constants.ExceptionConst;
-import ltd.inmind.accelerator.constants.SecurityConst;
 import ltd.inmind.accelerator.exception.AcceleratorException;
 import ltd.inmind.accelerator.model.po.UserAccount;
 import ltd.inmind.accelerator.model.vo.DataResponse;
@@ -63,16 +62,8 @@ public class LoginController {
     }
 
     @PostMapping("refreshToken")
+    @Deprecated
     public Mono<ResponseEntity<DataResponse>> refreshToken(UserAccount user, Authentication authentication) {
-        //比对传过来的username和当前已授权的username
-        if ("accept".equals(user.getAccount())){
-
-            //生成 token
-            return userService.refreshToken(authentication.getName())
-                    .map(refreshToken -> ResponseEntity.ok()
-                            .header(SecurityConst.AUTHENTICATION_HEADER, refreshToken)
-                            .body(new DataResponse().success()));
-        }
 
         return Mono.just(ResponseEntity.ok()
                 .body(new DataResponse().failed()));

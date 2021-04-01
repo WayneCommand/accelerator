@@ -2,7 +2,7 @@ package ltd.inmind.accelerator;
 
 import ltd.inmind.accelerator.mapper.Oauth2ClientMapper;
 import ltd.inmind.accelerator.mapper.UserAccountMapper;
-import ltd.inmind.accelerator.service.IJwtTokenSecurityContext;
+import ltd.inmind.accelerator.security.context.IJwtTokenSecurityContext;
 import ltd.inmind.accelerator.service.IUserAccountService;
 import ltd.inmind.accelerator.service.IUserService;
 import org.junit.jupiter.api.Test;

@@ -2,7 +2,7 @@ package ltd.inmind.accelerator.config;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import ltd.inmind.accelerator.security.filter.JwtAuthWebFilter;
+import ltd.inmind.accelerator.security.filter.LoginWebFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
@@ -15,22 +15,14 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.authentication.HttpStatusServerEntryPoint;
-import org.springframework.security.web.server.authentication.ServerAuthenticationFailureHandler;
-import org.springframework.security.web.server.authentication.ServerAuthenticationSuccessHandler;
-import org.springframework.security.web.server.context.ServerSecurityContextRepository;
+import org.springframework.web.server.WebFilter;
 
 @EnableWebFluxSecurity
 @Slf4j
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final ServerAuthenticationSuccessHandler authenticationSuccessHandler;
-
-    private final ServerAuthenticationFailureHandler authenticationFailureHandler;
-
     private final ReactiveUserDetailsService reactiveUserDetailsService;
-
-    private final ServerSecurityContextRepository serverSecurityContextRepository;
 
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
@@ -41,8 +33,7 @@ public class SecurityConfig {
                 .csrf().disable()
                 .httpBasic().disable()
                 .formLogin().disable()
-                .securityContextRepository(serverSecurityContextRepository)
-                .addFilterAt(jwtAuthWebFilter(), SecurityWebFiltersOrder.FORM_LOGIN)
+                .addFilterAt(loginWebFilter(), SecurityWebFiltersOrder.FORM_LOGIN)
                 .authorizeExchange(a -> a
                         .pathMatchers("/login/lookup", "/login/signUp", "/oauth/2/*")
                         .permitAll()
@@ -63,10 +54,9 @@ public class SecurityConfig {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
-    private JwtAuthWebFilter jwtAuthWebFilter() {
+    private WebFilter loginWebFilter() {
 
-        return new JwtAuthWebFilter(reactiveAuthenticationManager(), serverSecurityContextRepository,
-                authenticationSuccessHandler, authenticationFailureHandler);
+        return new LoginWebFilter(reactiveAuthenticationManager());
     }
 
     private ReactiveAuthenticationManager reactiveAuthenticationManager(){

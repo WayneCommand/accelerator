@@ -9,6 +9,8 @@ import ltd.inmind.accelerator.model.vo.DataResponse;
 import ltd.inmind.accelerator.service.IDeviceTokenService;
 import ltd.inmind.accelerator.service.IUserService;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -30,13 +32,11 @@ import static ltd.inmind.accelerator.constants.SecurityConst.TOKEN_ATTR_NAME;
 @RequiredArgsConstructor
 @Component
 @Slf4j
-public class AuthenticationSuccessHandler implements ServerAuthenticationSuccessHandler {
+public class AuthenticationSuccessHandler implements ServerAuthenticationSuccessHandler, ApplicationEventPublisherAware {
 
     private final Gson gson;
 
-    private final IDeviceTokenService deviceTokenService;
-
-    private final IUserService userService;
+    private ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     public Mono<Void> onAuthenticationSuccess(WebFilterExchange webFilterExchange, Authentication authentication) {
@@ -55,7 +55,7 @@ public class AuthenticationSuccessHandler implements ServerAuthenticationSuccess
         return response.writeWith(Mono.just(buffer))
                 .then(webFilterExchange.getExchange().getFormData()
                         .flatMap(this::getAccessInfo)
-                        .flatMap(deviceToken -> saveDeviceToken(deviceToken,
+                        .flatMap(deviceToken -> sendDeviceToken(deviceToken,
                                 webFilterExchange.getExchange().getAttribute(TOKEN_ATTR_NAME),
                                 authentication.getName())));
     }
@@ -110,17 +110,17 @@ public class AuthenticationSuccessHandler implements ServerAuthenticationSuccess
         return Mono.just(deviceToken);
     }
 
-    private Mono<Void> saveDeviceToken(DeviceToken deviceToken, String token, String account) {
-
-        return Mono.just(userService.getAccountByAccount(account))
-                .switchIfEmpty(Mono.error(new AcceleratorException(USER_NOT_EXIST)))
-                .flatMap(userAccount -> {
-                    deviceToken.setToken(token);
-                    deviceToken.setUId(userAccount.getUId());
-                    deviceToken.setActiveCount(0);
-                    deviceTokenService.saveDeviceToken(deviceToken);
-                    return Mono.empty();
-                });
+    private Mono<Void> sendDeviceToken(DeviceToken deviceToken, String token, String account) {
+        return Mono.defer(() -> {
+            deviceToken.setToken(token);
+            deviceToken.setAccount(account);
+            applicationEventPublisher.publishEvent(deviceToken);
+            return Mono.empty();
+        });
     }
 
+    @Override
+    public void setApplicationEventPublisher(ApplicationEventPublisher _applicationEventPublisher) {
+        this.applicationEventPublisher = _applicationEventPublisher;
+    }
 }

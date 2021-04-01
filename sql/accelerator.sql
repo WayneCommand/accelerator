@@ -4,6 +4,7 @@
 DROP TABLE IF EXISTS `u_device_token`;
 CREATE TABLE `u_device_token`  (
    `u_id` int(11) NOT NULL,
+   `account` varchar(255) NOT NULL,
    `token` varchar(255) NOT NULL,
    `device_id` varchar(255) NULL DEFAULT NULL,
    `device_type` varchar(255) NULL DEFAULT NULL,

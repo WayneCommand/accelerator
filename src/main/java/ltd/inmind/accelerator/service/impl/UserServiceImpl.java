@@ -34,10 +34,6 @@ public class UserServiceImpl implements IUserService {
 
     private final IDeviceTokenService deviceTokenService;
 
-    private final IJwtTokenSecurityContext jwtTokenSecurityContext;
-
-    private final ReactiveUserDetailsService reactiveUserDetailsService;
-
     private final KVPlusMap<String, String> verifyCache = new KVPlusMap<>();
 
     @Override
@@ -203,11 +199,6 @@ public class UserServiceImpl implements IUserService {
     public void updateUserAccount(UserAccount userAccount) {
 
         userAccountService.updateUserAccount(userAccount);
-    }
-
-    @Override
-    public Mono<String> refreshToken(String username) {
-        return jwtTokenSecurityContext.create(reactiveUserDetailsService.findByUsername(username));
     }
 
 }

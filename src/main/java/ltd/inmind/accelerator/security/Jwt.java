@@ -13,16 +13,23 @@ import java.util.*;
 
 /**
  * @author shenlanAZ
- * @since 0.1
+ * @since 0.2
  */
 @Slf4j
 public class Jwt {
 
     private String jwt;
 
+    private String secret;
+
     private static final long DEFAULT_EXPIRE_TIME = 10 * 60 * 1000;
 
     private Jwt(){
+    }
+
+    private Jwt(String _jwt, String _secret) {
+        jwt = _jwt;
+        secret = _secret;
     }
 
     public String getJwt(){
@@ -31,6 +38,10 @@ public class Jwt {
 
     private void setJwt(String _jwt){
         jwt = _jwt;
+    }
+
+    private void setSecret(String _secret) {
+        secret = _secret;
     }
 
     public static Jwt create(String secret) {
@@ -57,6 +68,7 @@ public class Jwt {
 
         Jwt _jwt = new Jwt();
         _jwt.setJwt(builder.sign(algorithm));
+        _jwt.setSecret(secret);
         return _jwt;
     }
 
@@ -82,15 +94,9 @@ public class Jwt {
         }
     }
 
-    public static Jwt from(String _jwt, String secret) {
-        Jwt jwt = new Jwt();
-        jwt.setJwt(_jwt);
-        if (!jwt.verify(secret))
-            return null;
-        return jwt;
-    }
-
-    private boolean verify(String secret){
+    public boolean isValid(){
+        if (Objects.isNull(secret))
+            return false;
         try {
             //根据密码生成JWT效验器
             Algorithm algorithm = Algorithm.HMAC256(secret);
@@ -103,6 +109,18 @@ public class Jwt {
             log.error("jwt verify failed", e);
             return false;
         }
+    }
+
+    public Jwt changeSecret(String _secret) {
+        return new Jwt(jwt, _secret);
+    }
+
+    public static Jwt from(String _jwt) {
+        return new Jwt(_jwt, null);
+    }
+
+    public static Jwt from(String _jwt, String _secret) {
+        return new Jwt(_jwt, _secret);
     }
 
     @Override

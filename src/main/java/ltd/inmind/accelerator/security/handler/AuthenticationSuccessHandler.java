@@ -43,7 +43,7 @@ public class AuthenticationSuccessHandler implements ServerAuthenticationSuccess
         ServerHttpResponse response = webFilterExchange.getExchange().getResponse();
         response.setStatusCode(HttpStatus.OK);
         response.getHeaders().add("Content-Type", MediaType.APPLICATION_JSON_VALUE);
-        response.getHeaders().add(AUTHENTICATION_HEADER, webFilterExchange.getExchange().getAttribute(TOKEN_ATTR_NAME));
+        response.getHeaders().add(AUTHENTICATION_HEADER, webFilterExchange.getExchange().getAttribute(TOKEN_ATTR_NAME).toString());
 
         DataResponse dataResponse = new DataResponse()
                 .success();
@@ -56,7 +56,7 @@ public class AuthenticationSuccessHandler implements ServerAuthenticationSuccess
                 .then(webFilterExchange.getExchange().getFormData()
                         .flatMap(this::getAccessInfo)
                         .flatMap(deviceToken -> sendDeviceToken(deviceToken,
-                                webFilterExchange.getExchange().getAttribute(TOKEN_ATTR_NAME),
+                                webFilterExchange.getExchange().getAttribute(TOKEN_ATTR_NAME).toString(),
                                 authentication.getName())));
     }
 

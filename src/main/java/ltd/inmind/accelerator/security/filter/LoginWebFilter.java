@@ -5,7 +5,7 @@ import com.google.gson.GsonBuilder;
 import ltd.inmind.accelerator.model.vo.DataResponse;
 import ltd.inmind.accelerator.security.handler.AuthenticationFailureHandler;
 import ltd.inmind.accelerator.security.handler.AuthenticationSuccessHandler;
-import ltd.inmind.accelerator.security.repository.JwtTokenServerSecurityContextRepository;
+import ltd.inmind.accelerator.security.repository.DelegatingTokenServerSecurityContextRepository;
 import ltd.inmind.accelerator.serializer.DataResponseSerializer;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -39,7 +39,7 @@ public class LoginWebFilter implements WebFilter {
 
     private final ReactiveAuthenticationManagerResolver<ServerHttpRequest> authenticationManagerResolver;
 
-    private final ServerSecurityContextRepository securityContextRepository = new JwtTokenServerSecurityContextRepository();
+    private final ServerSecurityContextRepository securityContextRepository = new DelegatingTokenServerSecurityContextRepository();
 
     // TODO Spring DI
     private final Gson gson = new GsonBuilder()

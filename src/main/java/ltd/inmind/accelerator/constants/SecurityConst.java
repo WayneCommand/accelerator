@@ -5,6 +5,8 @@ public interface SecurityConst {
 
     String AUTHENTICATION_HEADER = "X-AUTH-TOKEN";
 
+    String OAUTH_2_HEADER = "Authorization";
+
     String TOKEN_USER_KEY = "account";
 
 }

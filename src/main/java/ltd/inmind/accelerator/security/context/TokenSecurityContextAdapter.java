@@ -16,17 +16,17 @@ public interface TokenSecurityContextAdapter<T> {
      * @param securityContext 已认证的 context 不能为 null
      * @return token
      */
-    Mono<T> save(SecurityContext securityContext);
+    T save(SecurityContext securityContext);
 
     /**
      * 根据 token 从缓存中取出 context
      * @return
      */
-    Mono<SecurityContext> load(T token);
+    SecurityContext load(T token);
 
     /**
      * 移除该 token 的 context
      */
-    Mono<Void> remove(T token);
+    void remove(T token);
 
 }

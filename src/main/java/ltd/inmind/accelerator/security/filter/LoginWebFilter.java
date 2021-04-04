@@ -39,7 +39,7 @@ public class LoginWebFilter implements WebFilter {
 
     private final ReactiveAuthenticationManagerResolver<ServerHttpRequest> authenticationManagerResolver;
 
-    private final ServerSecurityContextRepository securityContextRepository = new DelegatingTokenServerSecurityContextRepository();
+    private final ServerSecurityContextRepository securityContextRepository;
 
     // TODO Spring DI
     private final Gson gson = new GsonBuilder()
@@ -55,9 +55,9 @@ public class LoginWebFilter implements WebFilter {
 
     private final String passwordParameter = "password";
 
-    public LoginWebFilter(ReactiveAuthenticationManager authenticationManager) {
-
+    public LoginWebFilter(ReactiveAuthenticationManager authenticationManager, ServerSecurityContextRepository contextRepository) {
         this.authenticationManagerResolver = request -> Mono.just(authenticationManager);
+        this.securityContextRepository = contextRepository;
     }
 
     /**

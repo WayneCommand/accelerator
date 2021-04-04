@@ -33,8 +33,7 @@ public class DelegatingTokenServerSecurityContextRepository implements ServerSec
         }
 
         // FIXME Reactive?
-        Jwt block = securityContextAdapter.save(context)
-                .block();
+        Jwt block = securityContextAdapter.save(context);
 
         exchange.getAttributes()
                 .put(TOKEN_ATTR_NAME, block);
@@ -56,6 +55,6 @@ public class DelegatingTokenServerSecurityContextRepository implements ServerSec
         exchange.getAttributes()
                 .put(TOKEN_ATTR_NAME, token);
 
-        return securityContextAdapter.load(Jwt.from(token));
+        return Mono.just(securityContextAdapter.load(Jwt.from(token)));
     }
 }

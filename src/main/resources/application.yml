@@ -6,9 +6,9 @@ spring:
     name: accelerator
 
   datasource:
-    driver-class-name: org.sqlite.JDBC
-    url: jdbc:sqlite:C:\Users\shenlan\mycloud.sqlite
+    url: jdbc:sqlite:/Users/shenlan/mycloud.sqlite
     type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: org.sqlite.JDBC
 
   mvc:
     converters:

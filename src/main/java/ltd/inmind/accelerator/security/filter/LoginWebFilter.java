@@ -1,12 +1,8 @@
 package ltd.inmind.accelerator.security.filter;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import ltd.inmind.accelerator.model.vo.DataResponse;
 import ltd.inmind.accelerator.security.handler.AuthenticationFailureHandler;
 import ltd.inmind.accelerator.security.handler.AuthenticationSuccessHandler;
-import ltd.inmind.accelerator.security.repository.DelegatingTokenServerSecurityContextRepository;
-import ltd.inmind.accelerator.serializer.DataResponseSerializer;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
@@ -41,23 +37,22 @@ public class LoginWebFilter implements WebFilter {
 
     private final ServerSecurityContextRepository securityContextRepository;
 
-    // TODO Spring DI
-    private final Gson gson = new GsonBuilder()
-            .registerTypeAdapter(DataResponse.class, new DataResponseSerializer())
-            .create();
+    private final ServerAuthenticationSuccessHandler authenticationSuccessHandler;
 
-    private final ServerAuthenticationSuccessHandler authenticationSuccessHandler = new AuthenticationSuccessHandler(gson);
-
-    private final ServerAuthenticationFailureHandler authenticationFailureHandler = new AuthenticationFailureHandler(gson);
+    private final ServerAuthenticationFailureHandler authenticationFailureHandler;
 
 
     private final String usernameParameter = "username";
 
     private final String passwordParameter = "password";
 
-    public LoginWebFilter(ReactiveAuthenticationManager authenticationManager, ServerSecurityContextRepository contextRepository) {
+    public LoginWebFilter(ReactiveAuthenticationManager authenticationManager,
+                          ServerSecurityContextRepository contextRepository,
+                          Gson gson) {
         this.authenticationManagerResolver = request -> Mono.just(authenticationManager);
         this.securityContextRepository = contextRepository;
+        authenticationSuccessHandler = new AuthenticationSuccessHandler(gson);
+        authenticationFailureHandler = new AuthenticationFailureHandler(gson);
     }
 
     /**

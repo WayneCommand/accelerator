@@ -1,12 +1,15 @@
 package ltd.inmind.accelerator.service;
 
 import ltd.inmind.accelerator.model.po.DeviceToken;
+import ltd.inmind.accelerator.security.events.DeviceTokenEvent;
 
 import java.util.List;
 
 public interface IDeviceTokenService {
 
     void saveDeviceToken(DeviceToken device);
+
+    void onDeviceTokenEvent(DeviceTokenEvent event);
 
     void updateToken(String origin,String token);
 

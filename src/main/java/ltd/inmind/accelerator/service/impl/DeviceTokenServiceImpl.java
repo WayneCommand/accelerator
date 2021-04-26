@@ -4,10 +4,12 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
 import ltd.inmind.accelerator.mapper.DeviceTokenMapper;
 import ltd.inmind.accelerator.model.po.DeviceToken;
+import ltd.inmind.accelerator.security.events.DeviceTokenEvent;
 import ltd.inmind.accelerator.security.events.TokenRemoveEvent;
 import ltd.inmind.accelerator.service.IDeviceTokenService;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -36,6 +38,12 @@ public class DeviceTokenServiceImpl implements IDeviceTokenService,ApplicationEv
         device.setLastTime(now);
 
         deviceTokenMapper.insert(device);
+    }
+
+    @EventListener
+    @Override
+    public void onDeviceTokenEvent(DeviceTokenEvent event) {
+        saveDeviceToken(event.getSource());
     }
 
     @Override

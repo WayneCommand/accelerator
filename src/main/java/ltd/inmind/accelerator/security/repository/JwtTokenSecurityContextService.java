@@ -1,4 +1,4 @@
-package ltd.inmind.accelerator.security.context;
+package ltd.inmind.accelerator.security.repository;
 
 import ltd.inmind.accelerator.constants.SecurityConst;
 import ltd.inmind.accelerator.security.Jwt;
@@ -13,12 +13,11 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
-public class JwtTokenSecurityContextAdapter implements TokenSecurityContextAdapter<Jwt> {
+public class JwtTokenSecurityContextService {
 
     private final Map<Jwt, SecurityContext> cache = new ConcurrentHashMap<>();
     private final Map<Jwt, String> tokenSecrets = new HashMap<>();
 
-    @Override
     public Jwt save(SecurityContext securityContext) {
         //从context里取出authentication信息
         Authentication authentication = securityContext.getAuthentication();
@@ -37,8 +36,8 @@ public class JwtTokenSecurityContextAdapter implements TokenSecurityContextAdapt
         return jwt;
     }
 
-    @Override
     public SecurityContext load(Jwt _token) {
+
         //先进行校验
         Jwt jwt = _token.changeSecret(tokenSecrets.get(_token));
 
@@ -48,8 +47,8 @@ public class JwtTokenSecurityContextAdapter implements TokenSecurityContextAdapt
         return null;
     }
 
-    @Override
     public void remove(Jwt _token) {
+
         cache.remove(_token);
         tokenSecrets.remove(_token);
     }

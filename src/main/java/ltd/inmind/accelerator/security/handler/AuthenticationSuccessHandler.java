@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import ltd.inmind.accelerator.exception.AcceleratorException;
 import ltd.inmind.accelerator.model.po.DeviceToken;
 import ltd.inmind.accelerator.model.vo.DataResponse;
+import ltd.inmind.accelerator.security.events.DeviceTokenEvent;
 import ltd.inmind.accelerator.service.IDeviceTokenService;
 import ltd.inmind.accelerator.service.IUserService;
 import org.apache.commons.lang3.StringUtils;
@@ -32,11 +33,9 @@ import static ltd.inmind.accelerator.constants.SecurityConst.TOKEN_ATTR_NAME;
 @RequiredArgsConstructor
 @Component
 @Slf4j
-public class AuthenticationSuccessHandler implements ServerAuthenticationSuccessHandler, ApplicationEventPublisherAware {
+public class AuthenticationSuccessHandler implements ServerAuthenticationSuccessHandler {
 
     private final Gson gson;
-
-    private ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     public Mono<Void> onAuthenticationSuccess(WebFilterExchange webFilterExchange, Authentication authentication) {
@@ -55,7 +54,8 @@ public class AuthenticationSuccessHandler implements ServerAuthenticationSuccess
         return response.writeWith(Mono.just(buffer))
                 .then(webFilterExchange.getExchange().getFormData()
                         .flatMap(this::getAccessInfo)
-                        .flatMap(deviceToken -> sendDeviceToken(deviceToken,
+                        .flatMap(deviceToken -> sendDeviceToken(webFilterExchange,
+                                deviceToken,
                                 webFilterExchange.getExchange().getAttribute(TOKEN_ATTR_NAME).toString(),
                                 authentication.getName())));
     }
@@ -110,17 +110,12 @@ public class AuthenticationSuccessHandler implements ServerAuthenticationSuccess
         return Mono.just(deviceToken);
     }
 
-    private Mono<Void> sendDeviceToken(DeviceToken deviceToken, String token, String account) {
-        return Mono.defer(() -> {
-            deviceToken.setToken(token);
-            deviceToken.setAccount(account);
-            applicationEventPublisher.publishEvent(deviceToken);
-            return Mono.empty();
-        });
-    }
+    private Mono<Void> sendDeviceToken(WebFilterExchange exchange, DeviceToken deviceToken, String token, String account) {
 
-    @Override
-    public void setApplicationEventPublisher(ApplicationEventPublisher _applicationEventPublisher) {
-        this.applicationEventPublisher = _applicationEventPublisher;
+        deviceToken.setToken(token);
+        deviceToken.setAccount(account);
+        exchange.getExchange().getApplicationContext()
+                .publishEvent(new DeviceTokenEvent(deviceToken));
+        return Mono.empty();
     }
 }

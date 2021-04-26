@@ -1,9 +1,12 @@
 package ltd.inmind.accelerator.config;
 
+import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ltd.inmind.accelerator.security.filter.LoginWebFilter;
+import ltd.inmind.accelerator.security.filter.TokenFilter;
 import ltd.inmind.accelerator.security.repository.DelegatingTokenServerSecurityContextRepository;
+import ltd.inmind.accelerator.security.repository.JwtTokenSecurityContextService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
@@ -26,7 +29,9 @@ public class SecurityConfig {
 
     private final ReactiveUserDetailsService reactiveUserDetailsService;
 
-    private final ServerSecurityContextRepository securityContextRepository = new DelegatingTokenServerSecurityContextRepository();
+    private final ServerSecurityContextRepository securityContextRepository = new DelegatingTokenServerSecurityContextRepository(securityContextService());
+
+    private final Gson gson;
 
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
@@ -38,6 +43,7 @@ public class SecurityConfig {
                 .httpBasic().disable()
                 .formLogin().disable()
                 .securityContextRepository(securityContextRepository)
+                .addFilterAt(tokenFilter(), SecurityWebFiltersOrder.CORS) // 先对 token 进行过滤
                 .addFilterAt(loginWebFilter(), SecurityWebFiltersOrder.FORM_LOGIN)
                 .authorizeExchange(a -> a
                         .pathMatchers("/login/lookup", "/login/signUp", "/oauth/2/*")
@@ -58,9 +64,15 @@ public class SecurityConfig {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
+    private WebFilter tokenFilter() {
+        return new TokenFilter();
+    }
+
     private WebFilter loginWebFilter() {
 
-        return new LoginWebFilter(reactiveAuthenticationManager(), securityContextRepository);
+        return new LoginWebFilter(reactiveAuthenticationManager(),
+                securityContextRepository,
+                gson);
     }
 
     private ReactiveAuthenticationManager reactiveAuthenticationManager(){
@@ -68,4 +80,7 @@ public class SecurityConfig {
         return new UserDetailsRepositoryReactiveAuthenticationManager(reactiveUserDetailsService);
     }
 
+    private JwtTokenSecurityContextService securityContextService() {
+        return new JwtTokenSecurityContextService();
+    }
 }

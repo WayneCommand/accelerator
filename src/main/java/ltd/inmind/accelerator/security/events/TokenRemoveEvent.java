@@ -8,4 +8,8 @@ public class TokenRemoveEvent extends ApplicationEvent {
         super(token);
     }
 
+    @Override
+    public String getSource() {
+        return (String) super.getSource();
+    }
 }

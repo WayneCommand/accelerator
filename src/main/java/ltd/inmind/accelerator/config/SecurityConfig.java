@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import ltd.inmind.accelerator.security.filter.LoginWebFilter;
 import ltd.inmind.accelerator.security.filter.TokenFilter;
 import ltd.inmind.accelerator.security.repository.DelegatingTokenServerSecurityContextRepository;
-import ltd.inmind.accelerator.security.repository.JwtTokenSecurityContextService;
+import ltd.inmind.accelerator.security.service.JwtTokenSecurityContextService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;

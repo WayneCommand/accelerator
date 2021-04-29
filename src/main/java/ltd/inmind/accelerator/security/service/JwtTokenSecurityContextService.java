@@ -1,8 +1,10 @@
-package ltd.inmind.accelerator.security.repository;
+package ltd.inmind.accelerator.security.service;
 
 import ltd.inmind.accelerator.constants.SecurityConst;
 import ltd.inmind.accelerator.security.Jwt;
+import ltd.inmind.accelerator.security.events.TokenRemoveEvent;
 import ltd.inmind.accelerator.utils.UUIDUtil;
+import org.springframework.context.event.EventListener;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Service;
@@ -53,4 +55,9 @@ public class JwtTokenSecurityContextService {
         tokenSecrets.remove(_token);
     }
 
+
+    @EventListener
+    public void onRemove(TokenRemoveEvent event) {
+        remove(Jwt.from(event.getSource()));
+    }
 }

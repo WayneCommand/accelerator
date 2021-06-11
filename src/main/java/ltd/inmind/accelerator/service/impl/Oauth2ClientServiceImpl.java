@@ -2,7 +2,9 @@ package ltd.inmind.accelerator.service.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
+import ltd.inmind.accelerator.constants.ExceptionConst;
 import ltd.inmind.accelerator.constants.Oauth2Const;
+import ltd.inmind.accelerator.exception.AcceleratorException;
 import ltd.inmind.accelerator.mapper.Oauth2ClientMapper;
 import ltd.inmind.accelerator.model.oauth2.Oauth2Client;
 import ltd.inmind.accelerator.service.Oauth2AccessTokenService;
@@ -83,15 +85,15 @@ public class Oauth2ClientServiceImpl implements Oauth2ClientService {
                         .eq(Oauth2Client::getClientId, client_id));
 
         if (oauth2Client == null)
-            throw new RuntimeException("client id error");
+            throw new AcceleratorException(ExceptionConst.OAUTH2_CLIENT_ID_INVALID);
 
         if (!oauth2Client.getClientSecret().equals(client_secret))
-            throw new RuntimeException("secret invalid");
+            throw new AcceleratorException(ExceptionConst.OAUTH2_SECRET_INVALID);
         String codeKey = client_id + "_" + code;
         String username = OAUTH2_MEM_CACHE.get(codeKey);
 
         if (username == null)
-            throw new RuntimeException("code expired");
+            throw new AcceleratorException(ExceptionConst.OAUTH2_CODE_EXPIRED);
 
         String token = client_id + "_" + username + "_" + UUIDUtil.generateShortUuid();
 

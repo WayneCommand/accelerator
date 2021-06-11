@@ -23,3 +23,6 @@ spring:
 mybatis-plus:
   global-config:
     banner: false
+
+datasource:
+  exec-type: normal

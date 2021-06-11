@@ -1,0 +1,9 @@
+{
+  "properties": [
+    {
+      "name": "datasource.exec-type",
+      "type": "java.lang.String",
+      "description": "accelerator 选择数据源的模式."
+    }
+  ]
+}

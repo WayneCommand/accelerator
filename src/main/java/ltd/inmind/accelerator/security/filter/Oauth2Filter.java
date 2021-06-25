@@ -48,14 +48,12 @@ public class Oauth2Filter implements WebFilter {
         return authorizeMatcher.matches(serverWebExchange)
                 .filter(ServerWebExchangeMatcher.MatchResult::isMatch)
                 .flatMap(mr -> convertForm(serverWebExchange))
-                .switchIfEmpty(webFilterChain.filter(serverWebExchange).then(Mono.empty()))
                 .flatMap(data -> authorize(data.getFirst("client_id"),
                         data.getFirst("redirect_uri"),
                         data.getFirst("scope"), serverWebExchange))
                 .and(accessTokenMatcher.matches(serverWebExchange)
                         .filter(ServerWebExchangeMatcher.MatchResult::isMatch)
                         .flatMap(mr -> convertForm(serverWebExchange))
-                        .switchIfEmpty(webFilterChain.filter(serverWebExchange).then(Mono.empty()))
                         .flatMap(data -> accessToken(data.getFirst("client_id"),
                                 data.getFirst("client_secret"),
                                 data.getFirst("code"),

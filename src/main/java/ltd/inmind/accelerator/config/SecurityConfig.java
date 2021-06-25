@@ -4,9 +4,12 @@ import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ltd.inmind.accelerator.security.filter.LoginWebFilter;
+import ltd.inmind.accelerator.security.filter.Oauth2Filter;
 import ltd.inmind.accelerator.security.filter.TokenFilter;
 import ltd.inmind.accelerator.security.repository.DelegatingTokenServerSecurityContextRepository;
 import ltd.inmind.accelerator.security.service.JwtTokenSecurityContextService;
+import ltd.inmind.accelerator.service.Oauth2ClientService;
+import ltd.inmind.accelerator.service.Oauth2Service;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
@@ -29,6 +32,8 @@ public class SecurityConfig {
 
     private final ReactiveUserDetailsService reactiveUserDetailsService;
 
+    private final Oauth2ClientService oauth2ClientService;
+
     private final ServerSecurityContextRepository securityContextRepository = new DelegatingTokenServerSecurityContextRepository(securityContextService());
 
     private final Gson gson;
@@ -45,6 +50,7 @@ public class SecurityConfig {
                 .securityContextRepository(securityContextRepository)
                 .addFilterAt(tokenFilter(), SecurityWebFiltersOrder.CORS) // 先对 token 进行过滤
                 .addFilterAt(loginWebFilter(), SecurityWebFiltersOrder.FORM_LOGIN)
+                .addFilterAt(oauth2Filter(), SecurityWebFiltersOrder.OAUTH2_AUTHORIZATION_CODE)
                 .authorizeExchange(a -> a
                         .pathMatchers("/login/lookup", "/login/signUp", "/oauth/2/*")
                         .permitAll()
@@ -83,4 +89,9 @@ public class SecurityConfig {
     private JwtTokenSecurityContextService securityContextService() {
         return new JwtTokenSecurityContextService();
     }
+
+    private Oauth2Filter oauth2Filter() {
+        return new Oauth2Filter(oauth2ClientService);
+    }
+
 }

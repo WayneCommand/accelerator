@@ -1,6 +1,7 @@
 package ltd.inmind.accelerator.config;
 
 import com.zaxxer.hikari.HikariDataSource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.system.ApplicationHome;
 import org.springframework.context.annotation.Bean;
@@ -9,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import javax.sql.DataSource;
 import java.io.File;
 
+@Slf4j
 @Configuration
 public class AppDataSource {
 
@@ -39,6 +41,8 @@ public class AppDataSource {
                 break;
             }
         }
+
+        log.info("Data Source Mode: {}", execType);
 
         return dataSource;
     }

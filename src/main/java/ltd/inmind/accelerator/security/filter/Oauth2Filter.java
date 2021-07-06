@@ -2,6 +2,7 @@ package ltd.inmind.accelerator.security.filter;
 
 import com.google.gson.Gson;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import ltd.inmind.accelerator.exception.AcceleratorException;
 import ltd.inmind.accelerator.service.Oauth2ClientService;
 import org.springframework.core.io.buffer.DataBuffer;
@@ -25,6 +26,7 @@ import java.nio.charset.StandardCharsets;
 /**
  * 接口参考：https://docs.github.com/en/developers/apps/building-oauth-apps/authorizing-oauth-apps
  */
+@Slf4j
 public class Oauth2Filter implements WebFilter {
 
     private final ServerWebExchangeMatcher authorizeMatcher = ServerWebExchangeMatchers
@@ -66,7 +68,13 @@ public class Oauth2Filter implements WebFilter {
                 .flatMap(Mono::just);
     }
 
-    // 1. 用户确认认证请求 (/login/oauth/authorize)
+    /**
+     * 1. 用户确认认证请求 (/login/oauth/authorize)
+     * @param clientId      客户端ID
+     * @param redirectUri   重定向URL
+     * @param scope         请求权限
+     * @return
+     */
     Mono<Void> authorize(String clientId, String redirectUri, String scope, ServerWebExchange exchange) {
 
         if (!oauth2ClientService.verifyClientId(clientId))
@@ -75,15 +83,25 @@ public class Oauth2Filter implements WebFilter {
         // 将带着授权码(code) 重定向到redirect url
         String code = oauth2ClientService.grantCode(clientId, null);
 
+        log.info("Oauth2 Authorize ClientId: {} Code: {}", clientId, code);
+
         return redirectStrategy.sendRedirect(exchange, URI.create(String.format("%s?code=%s", redirectUri, code)));
     }
 
-    // 3. 请求 token (/login/oauth/access_token)
+    /**
+     * 2. 请求 token (/login/oauth/access_token)
+     * @param clientId      客户端ID
+     * @param clientSecret  客户端私钥
+     * @param code          验证
+     * @return e.g: {"access_token":"gho_16C7e42F292c6912E7710c838347Ae178B4a", "scope":"repo,gist", "token_type":"bearer"}
+     */
     Mono<Void> accessToken(String clientId, String clientSecret, String code, ServerWebExchange exchange) {
 
         //验证id 和 secret 和 code
         try {
             String accessToken = oauth2ClientService.accessToken(clientId, clientSecret, code);
+
+            log.info("Oauth2 AccessToken ClientId: {} Token: {}", clientId, accessToken);
 
             AccessToken token = new AccessToken();
             token.setAccess_token(accessToken);
@@ -93,8 +111,6 @@ public class Oauth2Filter implements WebFilter {
             System.err.println(e.getMsg());
             throw e;
         }
-
-        // {"access_token":"gho_16C7e42F292c6912E7710c838347Ae178B4a", "scope":"repo,gist", "token_type":"bearer"}
     }
 
     Mono<Void> onAccessToken(AccessToken accessToken, ServerWebExchange exchange) {

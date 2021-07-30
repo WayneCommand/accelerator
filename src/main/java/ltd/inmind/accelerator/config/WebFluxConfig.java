@@ -2,8 +2,6 @@ package ltd.inmind.accelerator.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import ltd.inmind.accelerator.model.vo.DataResponse;
-import ltd.inmind.accelerator.serializer.DataResponseSerializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -40,7 +38,6 @@ public class WebFluxConfig implements WebFluxConfigurer {
     @Bean
     public Gson gson() {
         GsonBuilder builder = new GsonBuilder();
-        builder.registerTypeAdapter(DataResponse.class, new DataResponseSerializer());
 
         return builder.create();
     }
